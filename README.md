@@ -2,9 +2,9 @@
 
 Install this library with
 ```
-npm install lib-zenodo-api
+npm install zenodo-lib
 ```
-View entry on https://www.npmjs.com/package/lib-zenodo-api [not active yet]
+View entry on https://www.npmjs.com/package/zenodo-lib
 
 This library is currently used by 
 - https://github.com/OpenDevEd/zenodo-cli-ts
