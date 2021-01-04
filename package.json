@@ -1,0 +1,51 @@
+{
+  "name": "zenodo-lib",
+  "version": "1.0.0",
+  "description": "A commandline tool to interact with the Zenodo API. Developed by [@bjohas](https://github.com/bjohas) and [@a1diablo](https://github.com/a1diablo).",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "argparse": "^2.0.1",
+    "axios": "^0.21.1",
+    "http-link-header": "^1.0.3",
+    "json": "^10.0.0",
+    "opn": "^6.0.0",
+    "os": "^0.1.1",
+    "pathlib": "^0.1.2",
+    "pprint": "0.0.1",
+    "re": "^0.1.4",
+    "request-promise-native": "^1.0.9",
+    "requests": "^0.3.0",
+    "sys": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/argparse": "^2.0.4",
+    "@types/node": "^14.6.4",
+    "typescript": "^3.9.7"
+  },
+  "scripts": {
+    "start": "node ./build/index.js",
+    "build": "tsc --project ./tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build",
+    "version:old": "git add -A src",
+    "postversion": "git push && git push --tags",
+    "publish:patch": "npm version patch; npm publish; git push --tags",
+    "publish:minor": "npm version minor; npm publish; git push --tags",
+    "publish:major": "npm version major; npm publish; git push --tags"
+  },
+  "files": [
+    "build/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bjohas/Zenodo-tools.git"
+  },
+  "author": "Björn Haßler",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/bjohas/Zenodo-tools/issues"
+  },
+  "homepage": "https://github.com/bjohas/Zenodo-tools#readme"
+}

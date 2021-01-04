@@ -1,0 +1,11 @@
+{
+  "name": "pprint",
+  "version": "0.0.1",
+  "description": "provides p, pp, tap and releated methods: time-savers for logging in testing/development",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tim Ruffles <oi@truffles.me.uk>",
+  "license": "BSD-2-Clause"
+}
