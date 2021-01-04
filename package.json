@@ -40,12 +40,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bjohas/Zenodo-tools.git"
+    "url": "git+https://github.com/opendeved/zenodo-lib.git"
   },
-  "author": "Björn Haßler",
-  "license": "",
+  "author": "opendeved",
+  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/bjohas/Zenodo-tools/issues"
+    "url": "https://github.com/opendeved/zenodo-lib/issues"
   },
-  "homepage": "https://github.com/bjohas/Zenodo-tools#readme"
+  "homepage": "https://github.com/opendeved/zenod-lib#readme"
 }
