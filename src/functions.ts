@@ -1,3 +1,15 @@
+module.exports.getrecord = getRecord;                                                                                                                                        
+module.exports.dump = dumpDeposition;                                                                                                                              
+module.exports.duplicate = duplicate;                                                                                                                                        
+module.exports.upload = upload;                                                                                                                                              
+module.exports.update = update;                                                                                                                                              
+module.exports.copy = copy;                                                                                                                                                  
+module.exports.list = listDepositions;                                                                                                                            
+module.exports.newversion = newVersion;                                                                                                                                      
+module.exports.download = download;                                                                                                                                          
+module.exports.concept = concept;                                                                                                                                            
+module.exports.create = create; 
+
 import axios from 'axios';
 // import { debug as debug } from 'console';
 import * as fs from "fs";
@@ -641,7 +653,7 @@ export async function concept(args) {
 
 // Top-level function - "zenodo-cli create'
 export async function create(args) {
-  mydebug(args, "zenodo.create", args)
+  mydebug(args, "zenodolib.create", args)
   // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
   const blankJson = `{
     "access_right": "open",
