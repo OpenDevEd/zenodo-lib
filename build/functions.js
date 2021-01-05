@@ -45,12 +45,12 @@ const opn_1 = __importDefault(require("opn"));
 const helper_1 = require("./helper");
 async function apiCall(args, options, fullResponse = false) {
     console.log(`API CALL`);
-    helper_1.mydebug(args, "apiCall: args=", args);
-    helper_1.mydebug(args, "apiCall: options=", options);
-    helper_1.mydebug(args, "apiCall: fullResponse=", fullResponse);
+    helper_1.mydebug(args, "apiCall-config(1): args=", args);
+    helper_1.mydebug(args, "apiCall-config(2): options=", options);
+    helper_1.mydebug(args, "apiCall-config(3): fullResponse=", fullResponse);
     try {
         const resData = await axios_1.default(options).then(res => {
-            console.log("then response");
+            console.log("axios->then");
             if ("verbose" in args && args.verbose) {
                 console.log(`response status code: ${res.status}`);
                 zenodoMessage(res.status);
@@ -62,19 +62,19 @@ async function apiCall(args, options, fullResponse = false) {
                 return res.data;
             }
         }).catch(function (err) {
-            console.log("err response");
+            console.log("axios->error");
             if ("verbose" in args && args.verbose) {
                 console.log(err);
             }
             axiosError(err);
             return null;
         });
-        helper_1.mydebug(args, "apiCall: data", resData);
+        helper_1.mydebug(args, "apiCall-result: data=", resData);
         return resData;
     }
     catch (e) {
-        console.log("ERROR");
-        helper_1.mydebug(args, "error in calling axios", e);
+        console.log("apiCall-ERROR");
+        helper_1.mydebug(args, "Error in calling axios", e);
         return null;
     }
 }
