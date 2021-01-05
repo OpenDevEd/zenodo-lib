@@ -1,14 +1,14 @@
-module.exports.getrecord = getRecord;                                                                                                                                        
+module.exports.getrecord = getRecord;
 module.exports.dump = dumpDeposition;                                                                                                                              
-module.exports.duplicate = duplicate;                                                                                                                                        
-module.exports.upload = upload;                                                                                                                                              
-module.exports.update = update;                                                                                                                                              
-module.exports.copy = copy;                                                                                                                                                  
-module.exports.list = listDepositions;                                                                                                                            
-module.exports.newversion = newVersion;                                                                                                                                      
-module.exports.download = download;                                                                                                                                          
-module.exports.concept = concept;                                                                                                                                            
-module.exports.create = create; 
+module.exports.duplicate = duplicate;
+module.exports.upload = upload;
+module.exports.update = update;
+module.exports.copy = copy;
+module.exports.list = listDepositions;
+module.exports.newversion = newVersion;
+module.exports.download = download;
+module.exports.concept = concept;
+module.exports.create = create;
 
 import axios from 'axios';
 // import { debug as debug } from 'console';
@@ -32,12 +32,12 @@ import {
 
 async function apiCall(args, options, fullResponse = false) {
   console.log(`API CALL`)
-  mydebug(args, "apiCall: args=", args)
-  mydebug(args, "apiCall: options=", options)
-  mydebug(args, "apiCall: fullResponse=", fullResponse)
+  mydebug(args, "apiCall-config(1): args=", args)
+  mydebug(args, "apiCall-config(2): options=", options)
+  mydebug(args, "apiCall-config(3): fullResponse=", fullResponse)
   try {
     const resData = await axios(options).then(res => {
-      console.log("then response")
+      console.log("axios->then")
       if ("verbose" in args && args.verbose) {
         console.log(`response status code: ${res.status}`)
         zenodoMessage(res.status)
@@ -48,18 +48,18 @@ async function apiCall(args, options, fullResponse = false) {
         return res.data;
       }
     }).catch(function (err) {
-      console.log("err response")
+      console.log("axios->error")
       if ("verbose" in args && args.verbose) {
         console.log(err);
       }
       axiosError(err)
       return null
     });
-    mydebug(args, "apiCall: data", resData)
+    mydebug(args, "apiCall-result: data=", resData)
     return resData
   } catch (e) {
-    console.log("ERROR")
-    mydebug(args, "error in calling axios", e)
+    console.log("apiCall-ERROR")
+    mydebug(args, "Error in calling axios", e)
     return null
   }
 }
