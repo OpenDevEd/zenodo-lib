@@ -23,6 +23,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.create = exports.concept = exports.download = exports.newVersion = exports.listDepositions = exports.copy = exports.update = exports.upload = exports.duplicate = exports.dumpDeposition = exports.getRecord = void 0;
+module.exports.getrecord = getRecord;
+module.exports.dump = dumpDeposition;
+module.exports.duplicate = duplicate;
+module.exports.upload = upload;
+module.exports.update = update;
+module.exports.copy = copy;
+module.exports.list = listDepositions;
+module.exports.newversion = newVersion;
+module.exports.download = download;
+module.exports.concept = concept;
+module.exports.create = create;
 const axios_1 = __importDefault(require("axios"));
 // import { debug as debug } from 'console';
 const fs = __importStar(require("fs"));
@@ -607,7 +618,7 @@ async function concept(args) {
 exports.concept = concept;
 // Top-level function - "zenodo-cli create'
 async function create(args) {
-    helper_1.mydebug(args, "zenodo.create", args);
+    helper_1.mydebug(args, "zenodolib.create", args);
     // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
     const blankJson = `{
     "access_right": "open",
