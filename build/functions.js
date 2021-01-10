@@ -646,7 +646,7 @@ async function create(args) {
     const metadata = helper_1.updateMetadata(args, JSON.parse(blankJson));
     let response_data;
     response_data = await createRecord(args, metadata);
-    console.log("RESP: " + response_data);
+    console.log("RESP: " + JSON.stringify(response_data));
     let response_data_2 = null;
     if (response_data) {
         response_data_2 = await finalActions2(args, response_data);
