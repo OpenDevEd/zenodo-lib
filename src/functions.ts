@@ -35,8 +35,9 @@ async function apiCall(args, options, fullResponse = false) {
   mydebug(args, "zenodo-lib/apiCall-config(1): args=", args)
   mydebug(args, "zenodo-lib/apiCall-config(2): options=", options)
   mydebug(args, "zenodo-lib/apiCall-config(3): fullResponse=", fullResponse)
-  try {
-    const resData = axios(options).then(res => {
+    try {
+      // Should this await be here?
+      const resData = await axios(options).then(res => {
       console.log("zenodo-lib/axios->then")
       if ("verbose" in args && args.verbose) {
         console.log(`zenodo-lib/response status code: ${res.status}`)
