@@ -30,6 +30,21 @@ import {
   myverbose
 } from "./helper";
 
+/*
+module.exports.ZenodoAPI = ZenodoAPI
+
+async function ZenodoAPI(args) {
+    try {
+	return CallFunctionWithName(args.action, args)
+    } catch (e) {
+	return {
+	    "status": "error",
+	    "data" : e
+	}
+    }
+}
+*/
+
 async function apiCall(args, options, fullResponse = false) {
   console.log(`API CALL`)
   mydebug(args, "zenodo-lib/apiCall-config(1): args=", args)
