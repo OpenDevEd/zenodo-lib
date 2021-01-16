@@ -176,6 +176,7 @@ export function updateMetadata(args, metadata) {
       if (authorProvided) {
         creatorsNew = metadata["creators"]
       }
+
       let auth_arr
       if (Array.isArray(args.authors)) {
         auth_arr = args.authors
@@ -208,11 +209,11 @@ export function updateMetadata(args, metadata) {
           }
           creatorsNew.push(newentry);
         });
-      } catch (e) {
-        console.log("Error in authors setting inside zenodo-lib - authors will have missing data.")
+      } catch (e) { 
+        console.log("Error in authors - data likely to be incomplete. "+e)
       }
-      metadata["creators"] = creatorsNew
     }
+    metadata["creators"] = creatorsNew
   }
 
   //console.log(`Step 1. ${metadata}`);
