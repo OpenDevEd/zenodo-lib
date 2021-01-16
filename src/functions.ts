@@ -446,6 +446,7 @@ export async function update(args) {
   }
   // As top-level function, execute final actions.
   await finalActions(args, id, deposit_url);
+  return responseUpdateRecord
 }
 
 export async function copy(args) {
