@@ -279,7 +279,7 @@ export function updateMetadata(args, metadata) {
       "scheme": "url"
     }];
   }
-  // console.log(JSON.stringify(metadata))
+  console.log(JSON.stringify(metadata, null, 2))
   return metadata;
 }
 
