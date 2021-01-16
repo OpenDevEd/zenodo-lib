@@ -1,5 +1,5 @@
 module.exports.getrecord = getRecord;
-module.exports.dump = dumpDeposition;                                                                                                                              
+module.exports.dump = dumpDeposition;
 module.exports.duplicate = duplicate;
 module.exports.upload = upload;
 module.exports.update = update;
@@ -35,12 +35,12 @@ module.exports.ZenodoAPI = ZenodoAPI
 
 async function ZenodoAPI(args) {
     try {
-	return CallFunctionWithName(args.action, args)
+  return CallFunctionWithName(args.action, args)
     } catch (e) {
-	return {
-	    "status": "error",
-	    "data" : e
-	}
+  return {
+      "status": "error",
+      "data" : e
+  }
     }
 }
 */
@@ -50,9 +50,9 @@ async function apiCall(args, options, fullResponse = false) {
   mydebug(args, "zenodo-lib/apiCall-config(1): args=", args)
   mydebug(args, "zenodo-lib/apiCall-config(2): options=", options)
   mydebug(args, "zenodo-lib/apiCall-config(3): fullResponse=", fullResponse)
-    try {
-      // Should this await be here?
-      const resData = await axios(options).then(res => {
+  try {
+    // Should this await be here?
+    const resData = await axios(options).then(res => {
       console.log("zenodo-lib/axios->then")
       if ("verbose" in args && args.verbose) {
         console.log(`zenodo-lib/response status code: ${res.status}`)
@@ -330,18 +330,22 @@ async function finalActions2(args, data) {
 }
 
 // Top-level function - "zenodo-cli get'
+// TODO: Separate this out into getRecords and getRecord
 export async function getRecord(args) {
   let data, ids;
-  ids = parseIds(args.id);
-  ids.forEach(async function (id) {
-    console.log(`saveIdsToJson ---0`)
-    data = await getData(args, id);
+  let output = []
+  ids = parseIds(args.id)
+  for (const id of ids) {
+    //console.log(`saveIdsToJson ---0`)
+    data = await getData(args, id)
+    output.push(data)
     console.log(JSON.stringify(data))
-    console.log(`saveIdsToJson ---1a`)
+    // Write record - TODO - should make this conditional
+    //console.log(`saveIdsToJson ---1a`)
     let path = `${id}.json`;
-    console.log(`saveIdsToJson ---1b`)
+    //console.log(`saveIdsToJson ---1b`)
     let buffer = Buffer.from(JSON.stringify(data["metadata"]));
-    console.log(`saveIdsToJson ---2`)
+    //console.log(`saveIdsToJson ---2`)
     fs.open(path, 'w', function (err, fd) {
       if (err) {
         throw 'could not open file: ' + err;
@@ -360,7 +364,8 @@ export async function getRecord(args) {
     console.log(`saveIdsToJson ---3`)
     await finalActions(args, id, data["links"]["html"]);
     console.log(`saveIdsToJson ---4`)
-  })
+  }
+  return output
 }
 
 export async function dumpDeposition(args, id) {
@@ -440,7 +445,7 @@ export async function update(args) {
       await fileUpload(args, bucket_url, filePath).then(async () => {
         // TO DO:DONE
         // Wait for promises to complete before calling final actions:
-          await finalActions(args, id, deposit_url);
+        await finalActions(args, id, deposit_url);
       });
     })
   }
@@ -676,8 +681,8 @@ export async function create(args) {
     "access_right": "open",
     "creators": [
       {
-          "name": "No name available.",
-          "affiliation": "No affiliation available."
+        "name": "No name available.",
+        "affiliation": "No affiliation available."
       }
     ],
     "title": "No title available.",
