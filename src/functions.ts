@@ -361,9 +361,9 @@ export async function getRecord(args) {
         });
       });
     });
-    console.log(`saveIdsToJson ---3`)
+    //console.log(`saveIdsToJson ---3`)
     await finalActions(args, id, data["links"]["html"]);
-    console.log(`saveIdsToJson ---4`)
+    //console.log(`saveIdsToJson ---4`)
   }
   return output
 }
