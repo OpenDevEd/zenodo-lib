@@ -48,12 +48,12 @@ module.exports.ZenodoAPI = ZenodoAPI
 
 async function ZenodoAPI(args) {
     try {
-    return CallFunctionWithName(args.action, args)
+  return CallFunctionWithName(args.action, args)
     } catch (e) {
-    return {
-        "status": "error",
-        "data" : e
-    }
+  return {
+      "status": "error",
+      "data" : e
+  }
     }
 }
 */
@@ -315,18 +315,22 @@ async function finalActions2(args, data) {
     return return_value;
 }
 // Top-level function - "zenodo-cli get'
+// TODO: Separate this out into getRecords and getRecord
 async function getRecord(args) {
     let data, ids;
+    let output = [];
     ids = helper_1.parseIds(args.id);
-    ids.forEach(async function (id) {
-        console.log(`saveIdsToJson ---0`);
+    for (const id of ids) {
+        //console.log(`saveIdsToJson ---0`)
         data = await getData(args, id);
+        output.push(data);
         console.log(JSON.stringify(data));
-        console.log(`saveIdsToJson ---1a`);
+        // Write record - TODO - should make this conditional
+        //console.log(`saveIdsToJson ---1a`)
         let path = `${id}.json`;
-        console.log(`saveIdsToJson ---1b`);
+        //console.log(`saveIdsToJson ---1b`)
         let buffer = Buffer.from(JSON.stringify(data["metadata"]));
-        console.log(`saveIdsToJson ---2`);
+        //console.log(`saveIdsToJson ---2`)
         fs.open(path, 'w', function (err, fd) {
             if (err) {
                 throw 'could not open file: ' + err;
@@ -346,7 +350,8 @@ async function getRecord(args) {
         console.log(`saveIdsToJson ---3`);
         await finalActions(args, id, data["links"]["html"]);
         console.log(`saveIdsToJson ---4`);
-    });
+    }
+    return output;
 }
 exports.getRecord = getRecord;
 async function dumpDeposition(args, id) {

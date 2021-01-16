@@ -1,4 +1,4 @@
-export declare function getRecord(args: any): Promise<void>;
+export declare function getRecord(args: any): Promise<any[]>;
 export declare function dumpDeposition(args: any, id: any): Promise<void>;
 export declare function duplicate(args: any): Promise<void>;
 export declare function upload(args: any): Promise<void>;
