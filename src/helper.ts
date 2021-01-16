@@ -180,33 +180,37 @@ export function updateMetadata(args, metadata) {
       if (Array.isArray(args.authors)) {
         auth_arr = args.authors
       } else {
-        auth_arr = [ args.authors ]
+        auth_arr = [args.authors]
       }
-      auth_arr.forEach(creator => {
-        const entry = creator.split(/ *; */);
-        let newentry = {}
-        // TODO
-        // This should result in an error:
-        // npm start -- create --authors
-        if (entry[0] == "") {
-          console.log("Error: The author provided with --authors was blank. You need to provide at least one author.")
-          process.exit(1)
-        }
-        newentry["name"] = entry[0]
-        if (entry.length >= 2 && entry[1] != "") {
-          newentry["affiliation"] = entry[1]
-        } else if ("affiliation" in authorInformationDict[entry[0]]) {
-          console.log("Do we get here?")
-          // Excercise left to the developer: Why do we not need to write && "affliation" in authorInformationDict[entry[0]] ?
-          newentry = authorInformationDict[entry[0]]
-        }
-        if (entry.length >= 3) {
-          newentry["orcid"] = entry[2]
-        } else if (authorInformationDict[entry[0]] && "orcid" in authorInformationDict[entry[0]]) {
-          newentry["orcid"] = authorInformationDict[entry[0]]["orcid"]
-        }
-        creatorsNew.push(newentry);
-      });
+      try {
+        auth_arr.forEach(creator => {
+          const entry = creator.split(/ *; */);
+          let newentry = {}
+          // TODO
+          // This should result in an error:
+          // npm start -- create --authors
+          if (entry[0] == "") {
+            console.log("Error: The author provided with --authors was blank. You need to provide at least one author.")
+            process.exit(1)
+          }
+          newentry["name"] = entry[0]
+          if (entry.length >= 2 && entry[1] != "") {
+            newentry["affiliation"] = entry[1]
+          } else if ("affiliation" in authorInformationDict[entry[0]]) {
+            console.log("Do we get here?")
+            // Excercise left to the developer: Why do we not need to write && "affliation" in authorInformationDict[entry[0]] ?
+            newentry = authorInformationDict[entry[0]]
+          }
+          if (entry.length >= 3) {
+            newentry["orcid"] = entry[2]
+          } else if (authorInformationDict[entry[0]] && "orcid" in authorInformationDict[entry[0]]) {
+            newentry["orcid"] = authorInformationDict[entry[0]]["orcid"]
+          }
+          creatorsNew.push(newentry);
+        });
+      } catch (e) {
+        console.log("Error in authors setting inside zenodo-lib - authors will have missing data.")
+      }
     }
     metadata["creators"] = creatorsNew
   }
