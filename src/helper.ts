@@ -211,8 +211,8 @@ export function updateMetadata(args, metadata) {
       } catch (e) {
         console.log("Error in authors setting inside zenodo-lib - authors will have missing data.")
       }
+      metadata["creators"] = creatorsNew
     }
-    metadata["creators"] = creatorsNew
   }
 
   //console.log(`Step 1. ${metadata}`);
