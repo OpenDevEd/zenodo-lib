@@ -43,6 +43,20 @@ const opn_1 = __importDefault(require("opn"));
 //for throw:
 //import { Observable, throwError } from 'rxjs';
 const helper_1 = require("./helper");
+/*
+module.exports.ZenodoAPI = ZenodoAPI
+
+async function ZenodoAPI(args) {
+    try {
+    return CallFunctionWithName(args.action, args)
+    } catch (e) {
+    return {
+        "status": "error",
+        "data" : e
+    }
+    }
+}
+*/
 async function apiCall(args, options, fullResponse = false) {
     console.log(`API CALL`);
     helper_1.mydebug(args, "zenodo-lib/apiCall-config(1): args=", args);
@@ -622,28 +636,27 @@ exports.concept = concept;
 async function create(args) {
     helper_1.mydebug(args, "zenodolib.create", args);
     // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
-    const blankJson = `{
-    "access_right": "open",
-    "creators": [
-      {
-          "name": "No name available.",
-          "affiliation": "No affiliation available."
-      }
-    ],
-    "title": "No title available.",
-    "description": "No description available.",
-    "communities": [
-      {
-        "identifier": "zenodo"
-      }
-    ],
-    "doi": "",
-    "publication_type": "report",
-    "upload_type": "publication"
-  }
-  `;
+    const zenodoDefault = {
+        "access_right": "open",
+        "creators": [
+            {
+                "name": "No name available.",
+                "affiliation": "No affiliation available."
+            }
+        ],
+        "title": "No title available.",
+        "description": "No description available.",
+        "communities": [
+            {
+                "identifier": "zenodo"
+            }
+        ],
+        "doi": "",
+        "publication_type": "report",
+        "upload_type": "publication"
+    };
     //const f = fs.readFileSync("blank.json", { encoding: 'utf8' });
-    const metadata = helper_1.updateMetadata(args, JSON.parse(blankJson));
+    const metadata = helper_1.updateMetadata(args, zenodoDefault);
     let response_data;
     response_data = await createRecord(args, metadata);
     console.log("RESP: " + JSON.stringify(response_data));

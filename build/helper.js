@@ -98,13 +98,40 @@ function dumpJSON(info) {
 exports.dumpJSON = dumpJSON;
 function parseIds(genericIds) {
     let ids = [];
-    genericIds.forEach(id => {
-        ids.push(parseId(id));
-    });
+    if (Array.isArray(genericIds)) {
+        genericIds.forEach(id => {
+            ids.push(parseId(id));
+        });
+    }
+    else {
+        ids.push(parseId(genericIds));
+    }
     return ids;
 }
 exports.parseIds = parseIds;
 function updateMetadata(args, metadata) {
+    /*
+    The object 'metadata' is updated with fields from 'args' and returned.
+    */
+    if (args.help) {
+        const help = {
+            args: {
+                json: "file with a json record",
+                title: "string",
+                date: "date string",
+                description: "string",
+                authordata: "file with authordata",
+                authors: "first last; first last; first last",
+                communities: "file to communities",
+                zotero_link: "string (zotero://...)"
+            },
+            metadata: {
+                title: "title of zenodo record etc"
+            }
+        };
+        console.log(JSON.stringify(help));
+        return 0;
+    }
     if (!metadata) {
         console.log(`Error in code: metadata is undefined.`);
         process.exit(1);
@@ -114,7 +141,7 @@ function updateMetadata(args, metadata) {
     let authorInformationDict, authorInfo;
     let authorProvided = false;
     authorInformationDict = {};
-    // If the --json argument is given, load the file, and overwrite metadata accordingly.
+    // If the --json/args.json argument is given, load the file, and overwrite metadata accordingly.
     if (("json" in args && args.json)) {
         if (fs.existsSync(args.json)) {
             const contents = fs.readFileSync(args.json, 'utf-8');
