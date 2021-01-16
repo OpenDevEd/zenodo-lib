@@ -671,7 +671,7 @@ export async function concept(args) {
 export async function create(args) {
   mydebug(args, "zenodolib.create", args)
   // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
-  const blankJson = `{
+  const zenodoDefault = {
     "access_right": "open",
     "creators": [
       {
@@ -690,9 +690,8 @@ export async function create(args) {
     "publication_type": "report",
     "upload_type": "publication"
   }
-  `;
   //const f = fs.readFileSync("blank.json", { encoding: 'utf8' });
-  const metadata = updateMetadata(args, JSON.parse(blankJson));
+  const metadata = updateMetadata(args, zenodoDefault);
   let response_data;
   response_data = await createRecord(args, metadata);
   console.log("RESP: " + JSON.stringify(response_data))
