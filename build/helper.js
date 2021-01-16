@@ -237,10 +237,10 @@ function updateMetadata(args, metadata) {
                 });
             }
             catch (e) {
-                console.log("Error in authors setting inside zenodo-lib - authors will have missing data.");
+                console.log("Error in authors - data likely to be incomplete. " + e);
             }
-            metadata["creators"] = creatorsNew;
         }
+        metadata["creators"] = creatorsNew;
     }
     //console.log(`Step 1. ${metadata}`);
     //console.log(typeof metadata)
