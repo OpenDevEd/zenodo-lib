@@ -219,19 +219,24 @@ function updateMetadata(args, metadata) {
                         process.exit(1);
                     }
                     newentry["name"] = entry[0];
-                    if (entry.length >= 2 && entry[1] != "") {
-                        newentry["affiliation"] = entry[1];
+                    try {
+                        if (entry.length >= 2 && entry[1] != "") {
+                            newentry["affiliation"] = entry[1];
+                        }
+                        else if ("affiliation" in authorInformationDict[entry[0]]) {
+                            console.log("Do we get here?");
+                            // Excercise left to the developer: Why do we not need to write && "affliation" in authorInformationDict[entry[0]] ?
+                            newentry = authorInformationDict[entry[0]];
+                        }
+                        if (entry.length >= 3) {
+                            newentry["orcid"] = entry[2];
+                        }
+                        else if (authorInformationDict[entry[0]] && "orcid" in authorInformationDict[entry[0]]) {
+                            newentry["orcid"] = authorInformationDict[entry[0]]["orcid"];
+                        }
                     }
-                    else if ("affiliation" in authorInformationDict[entry[0]]) {
-                        console.log("Do we get here?");
-                        // Excercise left to the developer: Why do we not need to write && "affliation" in authorInformationDict[entry[0]] ?
-                        newentry = authorInformationDict[entry[0]];
-                    }
-                    if (entry.length >= 3) {
-                        newentry["orcid"] = entry[2];
-                    }
-                    else if (authorInformationDict[entry[0]] && "orcid" in authorInformationDict[entry[0]]) {
-                        newentry["orcid"] = authorInformationDict[entry[0]]["orcid"];
+                    catch (e) {
+                        console.log("Error in author affiliations - data likely to be incomplete. " + e);
                     }
                     creatorsNew.push(newentry);
                 });
