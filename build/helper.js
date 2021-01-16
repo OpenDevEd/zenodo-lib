@@ -200,7 +200,13 @@ function updateMetadata(args, metadata) {
             if (authorProvided) {
                 creatorsNew = metadata["creators"];
             }
-            let auth_arr = args.authors;
+            let auth_arr;
+            if (Array.isArray(args.authors)) {
+                auth_arr = args.authors;
+            }
+            else {
+                auth_arr = [args.authors];
+            }
             auth_arr.forEach(creator => {
                 const entry = creator.split(/ *; */);
                 let newentry = {};
