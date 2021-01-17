@@ -2,8 +2,9 @@
   "name": "zenodo-lib",
   "version": "1.0.27",
   "description": "A commandline tool to interact with the Zenodo API. Developed by [@bjohas](https://github.com/bjohas) and [@a1diablo](https://github.com/a1diablo).",
-  "main": "build/functions.js",
-  "types": "build/functions.d.ts",
+  "main": "build/zenodo-lib.js",
+  "types": "build/zenodo-lib.d.ts",
+  "bin": "build/zenodo-cli.js",
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "argparse": "^2.0.1",
