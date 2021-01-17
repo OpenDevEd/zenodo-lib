@@ -22,7 +22,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const argparse = __importStar(require("argparse"));
 // PRODUCTION: Load library
-const zenodolib = require("zenodo-lib");
+const zenodolib = require("./zenodo-lib");
 // TESTING: Load locally for testing
 //   const zenodolib = require("../zenodo-lib/functions");
 /*

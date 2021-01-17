@@ -1,0 +1,21 @@
+{
+  "access_right": "open",
+  "creators": [
+    {
+	"name": "(name)",
+	"affiliation": "(affiliation)"
+    }
+  ],
+  "title": "No title available.",
+  "description": "No description available",
+  "communities": [
+    {
+      "identifier": "zenodo"
+    }
+  ],
+  "doi": "",
+  "publication_type": "report",
+  "upload_type": "publication"
+}
+
+
