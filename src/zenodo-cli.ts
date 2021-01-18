@@ -22,6 +22,10 @@ import {
 } from zenodolib; // from "lib-zenodo-api" where lib-zenodo-api is module in npm install
 */
 
+var pjson = require('../package.json')
+if (pjson.version)
+  console.log("version=" + pjson.version)
+
 function getArguments() {
   const parser = new argparse.ArgumentParser({ "description": "Zenodo command line utility" });
   parser.add_argument("--config", {
