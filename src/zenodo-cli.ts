@@ -24,7 +24,7 @@ import {
 
 var pjson = require('../package.json')
 if (pjson.version)
-  console.log("version=" + pjson.version)
+  console.log(`zenodo-lib version=${pjson.version}`)
 
 function getArguments() {
   const parser = new argparse.ArgumentParser({ "description": "Zenodo command line utility" });
@@ -56,32 +56,12 @@ function getArguments() {
 
   const subparsers = parser.add_subparsers({ "help": "sub-command help" });
   const parser_list = subparsers.add_parser("list", { "help": "List deposits for this account. Note that the Zenodo API does not seem to send continuation tokens. The first 1000 results are retrieved. Please use --page to retrieve more. The result is the record id, followed by the helper id." });
-  parser_list.add_argument("--page", { "action": "store", "help": "Page number of the list." });
-  parser_list.add_argument("--size", { "action": "store", "help": "Number of records in one page." });
-  parser_list.add_argument("--publish", {
-    "action": "store_true",
-    "help": "Publish the depositions after executing the command.",
-    "default": false
-  });
-  parser_list.add_argument("--open", {
-    "action": "store_true",
-    "help": "Open the depositions in the browser after executing the command.",
-    "default": false
-  });
-  parser_list.add_argument("--show", {
-    "action": "store_true",
-    "help": "Show key information for the depositions after executing the command.",
-    "default": false
-  });
-  parser_list.add_argument("--dump", {
-    "action": "store_true",
-    "help": "Show json for list and for depositions after executing the command.",
-    "default": false
-  });
   parser_list.set_defaults({ "func": zenodolib.listDepositions });
+  zenodolib.listDepositions({getInterface: true}, parser_list)
   //parser_list.set_defaults({ "action": "listDepositions" });
 
   const parser_get = subparsers.add_parser("get", { "help": "The get command gets the ids listed, and writes these out to id1.json, id2.json etc. The id can be provided as a number, as a deposit URL or record URL" });
+  parser_get.set_defaults({ "func": zenodolib.getRecord });
   parser_get.add_argument("id", { "nargs": "*" });
   parser_get.add_argument("--publish", {
     "action": "store_true",
@@ -103,7 +83,6 @@ function getArguments() {
     "help": "Show json for deposition after executing the command.",
     "default": false
   });
-  parser_get.set_defaults({ "func": zenodolib.getRecord });
 
   // Make sure these options stay in line with 'update'.
   const parser_create = subparsers.add_parser("create", { "help": "The create command creates new records based on the json files provided, optionally providing a title / date / description / files." });

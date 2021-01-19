@@ -469,12 +469,41 @@ export async function copy(args) {
   });
 }
 
+
 // Top-level function - "zenodo-cli list'
-export async function listDepositions(args) {
+export async function listDepositions(args, parser_list?) {
+  // listDepositions: define CLI interface
+  if (args.getInterface && parser_list) {
+    parser_list.add_argument("--page", { "action": "store", "help": "Page number of the list." });
+    parser_list.add_argument("--size", { "action": "store", "help": "Number of records in one page." });
+    parser_list.add_argument("--publish", {
+      "action": "store_true",
+      "help": "Publish the depositions after executing the command.",
+      "default": false
+    });
+    parser_list.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the depositions in the browser after executing the command.",
+      "default": false
+    });
+    parser_list.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show key information for the depositions after executing the command.",
+      "default": false
+    });
+    parser_list.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for list and for depositions after executing the command.",
+      "default": false
+    });
+    return { status: 0, message: "success" }
+  }
+  // listDepositions: check arguments
   mydebug(args, "listDepositions", args)
   const { zenodoAPIUrl, params } = loadConfig(args.config);
   params["page"] = args.page;
   params["size"] = (args.size ? args.size : 1000);
+  // actions
   const options = {
     method: 'get',
     url: zenodoAPIUrl,
@@ -507,7 +536,7 @@ export async function listDepositions(args) {
       const resfa = finalActions2(args, item);
       newres.push(resfa);
     });
-    // TODO - check. This is the right array, but not contains a promise... 
+    // TODO - check. This is the right array, but contains a promise... ?
     mydebug(args, "listDepositions: final", newres)
     return newres;
   }
