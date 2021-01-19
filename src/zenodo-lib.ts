@@ -1,4 +1,4 @@
-module.exports.getrecord = getRecord;
+module.exports.record = getRecord;
 module.exports.dump = dumpDeposition;
 module.exports.duplicate = duplicate;
 module.exports.upload = upload;
@@ -331,7 +331,34 @@ async function finalActions2(args, data) {
 
 // Top-level function - "zenodo-cli get'
 // TODO: Separate this out into getRecords and getRecord
-export async function getRecord(args) {
+export async function getRecord(args, subparsers?) {
+  // ACTION: define CLI interface
+  if (args.getInterface && subparsers) {
+    const parser_get = subparsers.add_parser("record", { "help": "The get command gets the record for the ids listed, and writes these out to id1.json, id2.json etc. The id can be provided as a number, as a deposit URL or record URL" });
+    parser_get.set_defaults({ "func": getRecord });
+    parser_get.add_argument("id", { "nargs": "*" });
+    parser_get.add_argument("--publish", {
+      "action": "store_true",
+      "help": "Publish the deposition after executing the command.",
+      "default": false
+    });
+    parser_get.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the deposition in the browser after executing the command.",
+      "default": false
+    });
+    parser_get.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show key information for the deposition after executing the command.",
+      "default": false
+    });
+    parser_get.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for deposition after executing the command.",
+      "default": false
+    });
+    return { status: 0, message: "success" }
+  }
   let data, ids;
   let output = []
   ids = parseIds(args.id)
@@ -373,7 +400,40 @@ export async function dumpDeposition(args, id) {
   dumpJSON(info);
 }
 
-export async function duplicate(args) {
+export async function duplicate(args, subparsers) {
+  if (args.getInterface && subparsers) {
+    // ACTION: define CLI interface
+    const parser_duplicate = subparsers.add_parser("duplicate", { "help": "The duplicate command duplicates the id to a new id, optionally providing a title / date / description / files." });
+    parser_duplicate.add_argument("id", { "nargs": 1 });
+    parser_duplicate.add_argument("--title", { "action": "store" });
+    parser_duplicate.add_argument("--date", { "action": "store" });
+    parser_duplicate.add_argument("--description", { "action": "store" });
+    parser_duplicate.add_argument("--files", { "nargs": "*" });
+    parser_duplicate.add_argument("--publish", {
+      "action": "store_true",
+      "help": "Publish the deposition after executing the command.",
+      "default": false
+    });
+    parser_duplicate.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the deposition in the browser after executing the command.",
+      "default": false
+    });
+    parser_duplicate.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show the info of the deposition after executing the command.",
+      "default": false
+    });
+    parser_duplicate.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for deposition after executing the command.",
+      "default": false
+    });
+    parser_duplicate.set_defaults({ "func": duplicate });
+    return { status: 0, message: "success" }
+  }
+  // ACTION: check arguments
+  // ACTIONS...
   let bucket_url, deposit_url, metadata, response_data;
   let data = await getData(args, args.id[0]);
   //getMetadata(args,args.id[0]);
@@ -395,9 +455,41 @@ export async function duplicate(args) {
     });
   }
   await finalActions(args, response_data["id"], deposit_url);
+  return 0
 }
 
-export async function upload(args) {
+export async function upload(args, subparsers) {
+  if (args.getInterface && subparsers) {
+    // ACTION: define CLI interface
+    const parser_upload = subparsers.add_parser("upload", { "help": "Just upload files (shorthand for update id --files ...)" });
+    parser_upload.add_argument("id", { "nargs": "?" });
+    parser_upload.add_argument("--bucketurl", { "action": "store" });
+    parser_upload.add_argument("files", { "nargs": "*" });
+    parser_upload.add_argument("--publish", {
+      "action": "store_true",
+      "help": "Publish the deposition after executing the command.",
+      "default": false
+    });
+    parser_upload.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the deposition in the browser after executing the command.",
+      "default": false
+    });
+    parser_upload.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show the info of the deposition after executing the command.",
+      "default": false
+    });
+    parser_upload.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for deposition after executing the command.",
+      "default": false
+    });
+    parser_upload.set_defaults({ "func": upload });
+    return { status: 0, message: "success" }
+  }
+  // ACTION: check arguments
+  // ACTIONS...
   var bucket_url, deposit_url, response;
   bucket_url = null;
   if (args.bucketurl) {
@@ -417,10 +509,60 @@ export async function upload(args) {
   } else {
     console.log("Unable to upload: id and bucketurl both not specified.");
   }
+  return 0
 }
 
 // Top-level function - "zenodo-cli update'
-export async function update(args) {
+export async function update(args, subparsers?) {
+  // ACTION: define CLI interface
+  if (args.getInterface && subparsers) {
+
+    // ACTION: check arguments
+    // Make sure that the options for update and create are the same. If you add options to update, also check the update function.
+    const parser_update = subparsers.add_parser("update", { "help": "The update command updates the id provided, with the title / date / description / files provided." });
+    parser_update.add_argument("id", { "nargs": 1 });
+    parser_update.add_argument("--title", { "action": "store" });
+    parser_update.add_argument("--date", { "action": "store" });
+    parser_update.add_argument("--description", { "action": "store" });
+    parser_update.add_argument("--files", { "nargs": "*" });
+    /*  parser_create.add_argument("--communities", {
+        "action": "store",
+        "help": "Read list of communities for the record from a file. Overrides data provided via --json."
+      });
+    */
+    parser_update.add_argument("--add-communities", { "nargs": "*" });
+    parser_update.add_argument("--remove-communities", { "nargs": "*" });
+    parser_update.add_argument("--zotero-link", {
+      "action": "store",
+      "help": "Zotero link of the zotero record to be linked."
+    });
+    parser_update.add_argument("--json", {
+      "action": "store",
+      "help": "Path of the JSON file with the metadata of the zenodo record to be updated."
+    });
+    parser_update.add_argument("--publish", {
+      "action": "store_true",
+      "help": "Publish the deposition after executing the command.",
+      "default": false
+    });
+    parser_update.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the deposition in the browser after executing the command.",
+      "default": false
+    });
+    parser_update.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show the info of the deposition after executing the command.",
+      "default": false
+    });
+    parser_update.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for deposition after executing the command.",
+      "default": false
+    });
+    parser_update.set_defaults({ "func": update });
+    return { status: 0, message: "success" }
+  }
   let bucket_url, data, deposit_url, id;
   let metadata;
 
@@ -454,7 +596,36 @@ export async function update(args) {
   return responseUpdateRecord
 }
 
-export async function copy(args) {
+export async function copy(args, subparsers) {
+  if (args.getInterface && subparsers) {
+    const parser_copy = subparsers.add_parser("multiduplicate", { "help": "Duplicates existing deposit with id multiple times, once for each file." });
+    parser_copy.add_argument("id", { "nargs": 1 });
+    parser_copy.add_argument("files", { "nargs": "*" });
+    parser_copy.add_argument("--publish", {
+      "action": "store_true",
+      "help": "Publish the deposition after executing the command.",
+      "default": false
+    });
+    parser_copy.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the deposition in the browser after executing the command.",
+      "default": false
+    });
+    parser_copy.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show the info of the deposition after executing the command.",
+      "default": false
+    });
+    parser_copy.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for deposition after executing the command.",
+      "default": false
+    });
+    parser_copy.set_defaults({ "func": copy });
+    return { status: 0, message: "success" }
+  }
+  // ACTION: check arguments
+  // ACTIONS...
   var bucket_url, metadata, response_data;
   metadata = getMetadata(args, args.id);
   delete metadata["doi"];
@@ -467,13 +638,17 @@ export async function copy(args) {
     await fileUpload(args, bucket_url, journal_filepath);
     await finalActions(args, response_data["id"], response_data["links"]["html"]);
   });
+  return 0
 }
 
-
 // Top-level function - "zenodo-cli list'
-export async function listDepositions(args, parser_list?) {
+export async function listDepositions(args, subparsers?) {
   // listDepositions: define CLI interface
-  if (args.getInterface && parser_list) {
+  if (args.getInterface && subparsers) {
+    const parser_list = subparsers.add_parser("list", { "help": "List deposits for this account. Note that the Zenodo API does not seem to send continuation tokens. The first 1000 results are retrieved. Please use --page to retrieve more. The result is the record id, followed by the helper id." });
+    parser_list.set_defaults({ "func": listDepositions });
+    //zenodolib.listDepositions({getInterface: true}, parser_list)
+    //parser_list.set_defaults({ "action": "listDepositions" });
     parser_list.add_argument("--page", { "action": "store", "help": "Page number of the list." });
     parser_list.add_argument("--size", { "action": "store", "help": "Number of records in one page." });
     parser_list.add_argument("--publish", {
@@ -544,7 +719,39 @@ export async function listDepositions(args, parser_list?) {
   return res
 }
 
-export async function newVersion(args) {
+export async function newVersion(args, subparsers) {
+  if (args.getInterface && subparsers) {
+    const parser_newversion = subparsers.add_parser("newversion", { "help": "The newversion command creates a new version of the deposition with id, optionally providing a title / date / description / files." });
+    parser_newversion.add_argument("id", { "nargs": 1 });
+    parser_newversion.add_argument("--title", { "action": "store" });
+    parser_newversion.add_argument("--date", { "action": "store" });
+    parser_newversion.add_argument("--description", { "action": "store" });
+    parser_newversion.add_argument("--files", { "nargs": "*" });
+    parser_newversion.add_argument("--publish", {
+      "action": "store_true",
+      "help": "Publish the deposition after executing the command.",
+      "default": false
+    });
+    parser_newversion.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the deposition in the browser after executing the command.",
+      "default": false
+    });
+    parser_newversion.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show the info of the deposition after executing the command.",
+      "default": false
+    });
+    parser_newversion.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for deposition after executing the command.",
+      "default": false
+    });
+    parser_newversion.set_defaults({ "func": newVersion });
+    return { status: 0, message: "success" }
+  }
+  // ACTION: check arguments
+  // ACTIONS...
   const { zenodoAPIUrl, params } = loadConfig(args.config);
   const id = parseId(args.id[0]);
   // Let's check a new version is possible.
@@ -582,9 +789,18 @@ export async function newVersion(args) {
 
   await finalActions(args, response_data["id"], deposit_url);
   console.log("latest_draft: ", response_data["links"]["latest_draft"]);
+  return 0
 }
 
-export async function download(args) {
+export async function download(args, subparsers) {
+  if (args.getInterface && subparsers) {
+    const parser_download = subparsers.add_parser("download", { "help": "Download all the files in the deposition." });
+    parser_download.add_argument("id", { "nargs": 1 });
+    parser_download.set_defaults({ "func": download });
+    return { status: 0, message: "success" }
+  }
+  // ACTION: check arguments
+  // ACTIONS...
   var data, id, name;
   id = parseId(args.id[0]);
   data = await getData(args, id);
@@ -673,10 +889,35 @@ export async function download(args) {
 
 
   */
+ return 0
 
 }
 
-export async function concept(args) {
+export async function concept(args, subparsers?) {
+  if (args.getInterface && subparsers) {
+    const parser_concept = subparsers.add_parser("concept", { "help": "Get the record id from the concept id." });
+    parser_concept.add_argument("id", { "nargs": 1 });
+    parser_concept.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for list and for depositions after executing the command.",
+      "default": false
+    });
+    parser_concept.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the deposition in the browser after executing the command.",
+      "default": false
+    });
+    parser_concept.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show the info of the deposition after executing the command.",
+      "default": false
+    });
+    //parsing agrument.
+    parser_concept.set_defaults({ "func": concept });
+    return { status: 0, message: "success" }
+  }
+  // ACTION: check arguments
+  // ACTIONS...
   const { zenodoAPIUrl, params } = loadConfig(args.config);
   params["q"] = `conceptrecid:${parseId(args.id[0])}`;
   const res = await axios.get(zenodoAPIUrl, { "params": params });
@@ -700,10 +941,82 @@ export async function concept(args) {
       opn(dep["links"]["html"]);
     }
   })
+  return 0
 }
 
 // Top-level function - "zenodo-cli create'
-export async function create(args) {
+export async function create(args, subparsers?) {
+  // ACTION: define CLI interface
+  if (args.getInterface && subparsers) {
+    // Make sure these options stay in line with 'update'.
+    const parser_create = subparsers.add_parser("create", { "help": "The create command creates new records based on the json files provided, optionally providing a title / date / description / files." });
+    parser_create.set_defaults({ "func": create });
+    parser_create.add_argument("--json", {
+      "action": "store",
+      "help": "Path of the JSON file with the metadata for the zenodo record to be created. If this file is not provided, a template is used. The following options override settings from the JSON file / template."
+    });
+    parser_create.add_argument("--title", {
+      "action": "store",
+      "help": "The title of the record. Overrides data provided via --json."
+    });
+    parser_create.add_argument("--date", {
+      "action": "store",
+      "help": "The date of the record. Overrides data provided via --json."
+    });
+    parser_create.add_argument("--description", {
+      "action": "store",
+      "help": "The description (abstract) of the record. Overrides data provided via --json."
+    });
+    parser_create.add_argument("--communities", {
+      "action": "store",
+      "help": "Read list of communities for the record from a file. Overrides data provided via --json."
+    });
+    parser_create.add_argument("--add-communities", {
+      "nargs": "*",
+      "action": "store",
+      "help": "List of communities to be added to the record (provided on the command line, one by one). Overrides data provided via --json."
+    });
+    parser_create.add_argument("--remove-communities", {
+      "nargs": "*",
+      "action": "store",
+      "help": "List of communities to be removed from the record (provided on the command line, one by one). Overrides data provided via --json."
+    });
+    parser_create.add_argument("--authors", {
+      "nargs": "*",
+      "action": "store",
+      "help": "List of authors, (provided on the command line, one by one). Separate institution and ORCID with semicolon, e.g. 'Lama Yunis;University of XYZ;0000-1234-...'. (You can also use --authordata.) Overrides data provided via --json."
+    });
+    parser_create.add_argument("--authordata", {
+      "action": "store",
+      "help": "A text file with a database of authors. Each line has author, institution, ORCID (tab-separated). The data is used to supplement insitution/ORCID to author names specified with --authors. Note that authors are only added to the record when specified with --authors, not because they appear in the specified authordate file. "
+    });
+    parser_create.add_argument("--zotero-link", {
+      "action": "store",
+      "help": "Zotero link of the zotero record to be linked. Overrides data provided via --json."
+    });
+    parser_create.add_argument("--publish", {
+      "action": "store_true",
+      "help": "Publish the deposition after executing the command.",
+      "default": false
+    });
+    parser_create.add_argument("--open", {
+      "action": "store_true",
+      "help": "Open the deposition in the browser after executing the command.",
+      "default": false
+    });
+    parser_create.add_argument("--show", {
+      "action": "store_true",
+      "help": "Show the info of the deposition after executing the command.",
+      "default": false
+    });
+    parser_create.add_argument("--dump", {
+      "action": "store_true",
+      "help": "Show json for deposition after executing the command.",
+      "default": false
+    });
+    return { status: 0, message: "success" }
+  }
+  // ACTION: check arguments
   mydebug(args, "zenodolib.create", args)
   // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
   const zenodoDefault = {
