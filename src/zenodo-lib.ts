@@ -691,8 +691,7 @@ export async function listDepositions(args, subparsers?) {
   if ("publish" in args && args.publish) {
     console.log("Warning: using 'list' with '--publish' means that all of your depositions will be published. Please confirm by typing yes.");
     // TODO
-    // Capture user input. If yser types yes, continue. If user types anything else, then abort.  
-    /* 
+    // Capture user input. If yser types yes, continue. If user types anything else, then abort.    
     var stdin = process.openStdin();
     stdin.addListener("data", function(d) {
       // note:  d is an object, and when converted to a string it will
@@ -700,7 +699,8 @@ export async function listDepositions(args, subparsers?) {
       // with toString() and then substring() 
       console.log("you entered: [" + d.toString().trim() + "]");
     }); 
-    */
+    // TODO ^^^ Fix this
+    process.exit(1)
   }
   if (res.length > 0) {
     var newres = []
@@ -835,8 +835,6 @@ export async function download(args, subparsers) {
       });
 
       //----------checksum
-
-
       fs.open(name + ".md5", 'w+', (err, fd) => {
 
         if (err) {
@@ -864,14 +862,11 @@ export async function download(args, subparsers) {
 
 
   } else {
-
     console.log("the record should be published and files uploaded")
-
   }
 
   /*
   OLD code:
-
     data["files"].forEach(async function (fileObj) {
     name = fileObj["filename"];
     console.log(`Downloading ${name}`);
@@ -883,9 +878,6 @@ export async function download(args, subparsers) {
     fp.write(((fileObj["checksum"] + " ") + fileObj["filename"]));
     fp.close();
   })
-
-
-
   */
   return 0
 
@@ -921,17 +913,19 @@ export async function concept(args, subparsers?) {
   const res = await axios.get(zenodoAPIUrl, { "params": params });
   if ((res.status !== 200)) {
     console.log(`Failed in concept(args): `, res.data);
-    process.exit(1);
+    return this.message(1, `Failed in concept(args): `, res.data)
   }
   if ("dump" in args && args.dump) {
     dumpJSON(res.data);
   }
+  // TODO: Create array, write pairs to array
   res.data.forEach(async function (dep) {
     console.log(dep["record_id"], dep["conceptrecid"]);
     // TODO replace what's below with finalactions.
     if ("publish" in args && args.publish) {
       await publishDeposition(args, dep["id"]);
     }
+    // TODO: ^^^ get value from publishDeposition (to indicate success); add that value to the array.
     if ("show" in args && args.show) {
       showDepositionJSON(dep);
     }
@@ -939,6 +933,7 @@ export async function concept(args, subparsers?) {
       opn(dep["links"]["html"]);
     }
   })
+  // return the array.
   return 0
 }
 

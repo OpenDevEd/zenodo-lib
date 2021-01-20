@@ -39,8 +39,8 @@ import {
   upload
 } from zenodolib; // from "lib-zenodo-api" where lib-zenodo-api is module in npm install
 */
-var pjson = require('../package.json');
 function getVersion() {
+    const pjson = require('../package.json');
     if (pjson.version)
         console.log(`zenodo-lib version=${pjson.version}`);
     return pjson.version;
@@ -74,7 +74,7 @@ function getArguments() {
     });
     parser.add_argument("--version", {
         "action": "store_true",
-        "help": "Showversion",
+        "help": "Show version",
     });
     const subparsers = parser.add_subparsers({ "help": "sub-command help" });
     zenodolib.list({ getInterface: true }, subparsers);

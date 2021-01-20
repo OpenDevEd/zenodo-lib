@@ -676,16 +676,16 @@ async function listDepositions(args, subparsers) {
     if ("publish" in args && args.publish) {
         console.log("Warning: using 'list' with '--publish' means that all of your depositions will be published. Please confirm by typing yes.");
         // TODO
-        // Capture user input. If yser types yes, continue. If user types anything else, then abort.  
-        /*
+        // Capture user input. If yser types yes, continue. If user types anything else, then abort.    
         var stdin = process.openStdin();
-        stdin.addListener("data", function(d) {
-          // note:  d is an object, and when converted to a string it will
-          // end with a linefeed.  so we (rather crudely) account for that
-          // with toString() and then substring()
-          console.log("you entered: [" + d.toString().trim() + "]");
+        stdin.addListener("data", function (d) {
+            // note:  d is an object, and when converted to a string it will
+            // end with a linefeed.  so we (rather crudely) account for that  
+            // with toString() and then substring() 
+            console.log("you entered: [" + d.toString().trim() + "]");
         });
-        */
+        // TODO ^^^ Fix this
+        process.exit(1);
     }
     if (res.length > 0) {
         var newres = [];
@@ -837,7 +837,6 @@ async function download(args, subparsers) {
     }
     /*
     OLD code:
-  
       data["files"].forEach(async function (fileObj) {
       name = fileObj["filename"];
       console.log(`Downloading ${name}`);
@@ -849,9 +848,6 @@ async function download(args, subparsers) {
       fp.write(((fileObj["checksum"] + " ") + fileObj["filename"]));
       fp.close();
     })
-  
-  
-  
     */
     return 0;
 }
@@ -886,17 +882,19 @@ async function concept(args, subparsers) {
     const res = await axios_1.default.get(zenodoAPIUrl, { "params": params });
     if ((res.status !== 200)) {
         console.log(`Failed in concept(args): `, res.data);
-        process.exit(1);
+        return this.message(1, `Failed in concept(args): `, res.data);
     }
     if ("dump" in args && args.dump) {
         helper_1.dumpJSON(res.data);
     }
+    // TODO: Create array, write pairs to array
     res.data.forEach(async function (dep) {
         console.log(dep["record_id"], dep["conceptrecid"]);
         // TODO replace what's below with finalactions.
         if ("publish" in args && args.publish) {
             await publishDeposition(args, dep["id"]);
         }
+        // TODO: ^^^ get value from publishDeposition (to indicate success); add that value to the array.
         if ("show" in args && args.show) {
             helper_1.showDepositionJSON(dep);
         }
@@ -904,6 +902,7 @@ async function concept(args, subparsers) {
             opn_1.default(dep["links"]["html"]);
         }
     });
+    // return the array.
     return 0;
 }
 exports.concept = concept;

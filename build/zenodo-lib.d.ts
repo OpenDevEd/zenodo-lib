@@ -25,8 +25,5 @@ export declare function download(args: any, subparsers: any): Promise<0 | {
     status: number;
     message: string;
 }>;
-export declare function concept(args: any, subparsers?: any): Promise<0 | {
-    status: number;
-    message: string;
-}>;
+export declare function concept(args: any, subparsers?: any): Promise<any>;
 export declare function create(args: any, subparsers?: any): Promise<any>;
