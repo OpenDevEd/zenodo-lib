@@ -76,13 +76,13 @@ function getArguments() {
 
 
 
-  parser.parse_args();
+  const parsed = parser.parse_args();
   if ((process.argv.length === 1)) {
     //this function not exist
     parser.print_help();
     process.exit(1);
   }
-  return parser.parse_args();
+  return parsed // r.parse_args();
 }
 
 // --- main ---

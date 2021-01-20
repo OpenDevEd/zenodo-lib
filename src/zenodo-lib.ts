@@ -516,8 +516,6 @@ export async function upload(args, subparsers) {
 export async function update(args, subparsers?) {
   // ACTION: define CLI interface
   if (args.getInterface && subparsers) {
-
-    // ACTION: check arguments
     // Make sure that the options for update and create are the same. If you add options to update, also check the update function.
     const parser_update = subparsers.add_parser("update", { "help": "The update command updates the id provided, with the title / date / description / files provided." });
     parser_update.add_argument("id", { "nargs": 1 });
@@ -525,11 +523,11 @@ export async function update(args, subparsers?) {
     parser_update.add_argument("--date", { "action": "store" });
     parser_update.add_argument("--description", { "action": "store" });
     parser_update.add_argument("--files", { "nargs": "*" });
-    /*  parser_create.add_argument("--communities", {
-        "action": "store",
-        "help": "Read list of communities for the record from a file. Overrides data provided via --json."
-      });
-    */
+    // TODO
+    parser_update.add_argument("--communities", {
+      "action": "store",
+      "help": "Read list of communities for the record from a file. Overrides data provided via --json."
+    });
     parser_update.add_argument("--add-communities", { "nargs": "*" });
     parser_update.add_argument("--remove-communities", { "nargs": "*" });
     parser_update.add_argument("--zotero-link", {
@@ -889,7 +887,7 @@ export async function download(args, subparsers) {
 
 
   */
- return 0
+  return 0
 
 }
 
