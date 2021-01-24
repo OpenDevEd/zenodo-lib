@@ -135,7 +135,9 @@ async function publishDeposition(args, id) {
     return responseDataFromAPIcall;
 }
 async function showDeposition(args, id) {
+    console.log("--->" + id);
     const info = await getData(args, helper_1.parseId(id));
+    jconsole.log("TEMPORARY=" + JSON.stringify(info, null, 2));
     helper_1.showDepositionJSON(info);
 }
 async function getData(args, id) {
