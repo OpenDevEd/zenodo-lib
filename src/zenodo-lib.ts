@@ -126,8 +126,10 @@ async function publishDeposition(args, id) {
 }
 
 async function showDeposition(args, id) {
-  const info = await getData(args, parseId(id));
-  showDepositionJSON(info);
+  console.log("--->"+id)
+  const info = await getData(args, parseId(id))
+  jconsole.log("TEMPORARY="+JSON.stringify(    info        ,null,2))
+  showDepositionJSON(info)
 }
 
 async function getData(args, id) {
