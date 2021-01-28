@@ -46,7 +46,7 @@ async function ZenodoAPI(args) {
 */
 
 async function apiCall(args, options, fullResponse = false) {
-  console.log(`API CALL`)
+  mydebug(args, `API CALL -- async function apiCall`, "")
   mydebug(args, "zenodo-lib/apiCall-config(1): args=", args)
   mydebug(args, "zenodo-lib/apiCall-config(2): options=", options)
   mydebug(args, "zenodo-lib/apiCall-config(3): fullResponse=", fullResponse)
@@ -59,8 +59,10 @@ async function apiCall(args, options, fullResponse = false) {
         zenodoMessage(res.status)
       };
       if (fullResponse) {
+        mydebug(args, `THEN - FINISHED - API CALL with fullresponse. res=`, res)
         return res;
       } else {
+        mydebug(args, `THEN - FINISHED - API CALL. res.data=`, res.data)
         return res.data;
       }
     }).catch(function (err) {
@@ -72,6 +74,7 @@ async function apiCall(args, options, fullResponse = false) {
       return null
     });
     mydebug(args, "zenodo-lib/apiCall-result: data=", resData)
+    mydebug(args, `FINISHED - API CALL`, "")
     return resData
   } catch (e) {
     console.log("zenodo-lib/apiCall-ERROR")
@@ -126,9 +129,9 @@ async function publishDeposition(args, id) {
 }
 
 async function showDeposition(args, id) {
-  console.log("--->"+id)
+  console.log("--->" + id)
   const info = await getData(args, parseId(id))
-  console.log("TEMPORARY="+JSON.stringify(    info        ,null,2))
+  console.log("TEMPORARY=" + JSON.stringify(info, null, 2))
   showDepositionJSON(info)
 }
 
@@ -136,7 +139,7 @@ async function getData(args, id) {
   const { zenodoAPIUrl, params } = loadConfig(args.config);
   myverbose(args, `getting data for ${id}`, null);
   id = parseId(id);
-  myverbose(args, `getting data for ${id}`, null);
+  myverbose(args, `ParseID for ${id}`, null);
   let options = {
     method: 'get',
     url: `${zenodoAPIUrl}`,
@@ -372,27 +375,31 @@ export async function getRecord(args, subparsers?) {
     // Write record - TODO - should make this conditional
     //console.log(`saveIdsToJson ---1a`)
     let path = `${id}.json`;
-    //console.log(`saveIdsToJson ---1b`)
-    let buffer = Buffer.from(JSON.stringify(data["metadata"]));
-    //console.log(`saveIdsToJson ---2`)
-    fs.open(path, 'w', function (err, fd) {
-      if (err) {
-        throw 'could not open file: ' + err;
-      }
-      /*
-       write the contents of the buffer, from position 0 to the end, to the file descriptor 
-      returned in opening our file
-      */
-      fs.write(fd, buffer, 0, buffer.length, null, function (err) {
-        if (err) throw 'error writing file: ' + err;
-        fs.close(fd, function () {
-          console.log('wrote the file successfully');
+    // console.log(`saveIdsToJson ---1b`)
+    if (data && data["metadata"]) {
+      let buffer = Buffer.from(JSON.stringify(data["metadata"]));
+      //console.log(`saveIdsToJson ---2`)
+      fs.open(path, 'w', function (err, fd) {
+        if (err) {
+          throw 'could not open file: ' + err;
+        }
+        /*
+         write the contents of the buffer, from position 0 to the end, to the file descriptor 
+        returned in opening our file
+        */
+        fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+          if (err) throw 'error writing file: ' + err;
+          fs.close(fd, function () {
+            console.log('wrote the file successfully');
+          });
         });
       });
-    });
-    //console.log(`saveIdsToJson ---3`)
-    await finalActions(args, id, data["links"]["html"]);
-    //console.log(`saveIdsToJson ---4`)
+      //console.log(`saveIdsToJson ---3`)
+      await finalActions(args, id, data["links"]["html"]);
+      //console.log(`saveIdsToJson ---4`)
+    } else {
+      console.log("Request completed successfully, but no data was retrieved. Do you have access to the record?")
+    }
   }
   return output
 }
@@ -695,12 +702,12 @@ export async function listDepositions(args, subparsers?) {
     // TODO
     // Capture user input. If yser types yes, continue. If user types anything else, then abort.    
     var stdin = process.openStdin();
-    stdin.addListener("data", function(d) {
+    stdin.addListener("data", function (d) {
       // note:  d is an object, and when converted to a string it will
       // end with a linefeed.  so we (rather crudely) account for that  
       // with toString() and then substring() 
       console.log("you entered: [" + d.toString().trim() + "]");
-    }); 
+    });
     // TODO ^^^ Fix this
     process.exit(1)
   }

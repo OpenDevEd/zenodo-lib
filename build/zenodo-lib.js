@@ -58,7 +58,7 @@ async function ZenodoAPI(args) {
 }
 */
 async function apiCall(args, options, fullResponse = false) {
-    console.log(`API CALL`);
+    helper_1.mydebug(args, `API CALL -- async function apiCall`, "");
     helper_1.mydebug(args, "zenodo-lib/apiCall-config(1): args=", args);
     helper_1.mydebug(args, "zenodo-lib/apiCall-config(2): options=", options);
     helper_1.mydebug(args, "zenodo-lib/apiCall-config(3): fullResponse=", fullResponse);
@@ -72,9 +72,11 @@ async function apiCall(args, options, fullResponse = false) {
             }
             ;
             if (fullResponse) {
+                helper_1.mydebug(args, `THEN - FINISHED - API CALL with fullresponse. res=`, res);
                 return res;
             }
             else {
+                helper_1.mydebug(args, `THEN - FINISHED - API CALL. res.data=`, res.data);
                 return res.data;
             }
         }).catch(function (err) {
@@ -86,6 +88,7 @@ async function apiCall(args, options, fullResponse = false) {
             return null;
         });
         helper_1.mydebug(args, "zenodo-lib/apiCall-result: data=", resData);
+        helper_1.mydebug(args, `FINISHED - API CALL`, "");
         return resData;
     }
     catch (e) {
@@ -144,7 +147,7 @@ async function getData(args, id) {
     const { zenodoAPIUrl, params } = helper_1.loadConfig(args.config);
     helper_1.myverbose(args, `getting data for ${id}`, null);
     id = helper_1.parseId(id);
-    helper_1.myverbose(args, `getting data for ${id}`, null);
+    helper_1.myverbose(args, `ParseID for ${id}`, null);
     let options = {
         method: 'get',
         url: `${zenodoAPIUrl}`,
@@ -357,28 +360,33 @@ async function getRecord(args, subparsers) {
         // Write record - TODO - should make this conditional
         //console.log(`saveIdsToJson ---1a`)
         let path = `${id}.json`;
-        //console.log(`saveIdsToJson ---1b`)
-        let buffer = Buffer.from(JSON.stringify(data["metadata"]));
-        //console.log(`saveIdsToJson ---2`)
-        fs.open(path, 'w', function (err, fd) {
-            if (err) {
-                throw 'could not open file: ' + err;
-            }
-            /*
-             write the contents of the buffer, from position 0 to the end, to the file descriptor
-            returned in opening our file
-            */
-            fs.write(fd, buffer, 0, buffer.length, null, function (err) {
-                if (err)
-                    throw 'error writing file: ' + err;
-                fs.close(fd, function () {
-                    console.log('wrote the file successfully');
+        console.log(`saveIdsToJson ---1b`);
+        if (data && data["metadata"]) {
+            let buffer = Buffer.from(JSON.stringify(data["metadata"]));
+            //console.log(`saveIdsToJson ---2`)
+            fs.open(path, 'w', function (err, fd) {
+                if (err) {
+                    throw 'could not open file: ' + err;
+                }
+                /*
+                 write the contents of the buffer, from position 0 to the end, to the file descriptor
+                returned in opening our file
+                */
+                fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+                    if (err)
+                        throw 'error writing file: ' + err;
+                    fs.close(fd, function () {
+                        console.log('wrote the file successfully');
+                    });
                 });
             });
-        });
-        //console.log(`saveIdsToJson ---3`)
-        await finalActions(args, id, data["links"]["html"]);
-        //console.log(`saveIdsToJson ---4`)
+            //console.log(`saveIdsToJson ---3`)
+            await finalActions(args, id, data["links"]["html"]);
+            //console.log(`saveIdsToJson ---4`)
+        }
+        else {
+            console.log("Request completed successfully, but no data was retrieved. Do you have access to the record?");
+        }
     }
     return output;
 }
