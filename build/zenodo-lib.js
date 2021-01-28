@@ -356,7 +356,7 @@ async function getRecord(args, subparsers) {
         //console.log(`saveIdsToJson ---0`)
         data = await getData(args, id);
         output.push(data);
-        console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data))
         // Write record - TODO - should make this conditional
         //console.log(`saveIdsToJson ---1a`)
         let path = `${id}.json`;
