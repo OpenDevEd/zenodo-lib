@@ -360,7 +360,7 @@ async function getRecord(args, subparsers) {
         // Write record - TODO - should make this conditional
         //console.log(`saveIdsToJson ---1a`)
         let path = `${id}.json`;
-        console.log(`saveIdsToJson ---1b`);
+        // console.log(`saveIdsToJson ---1b`)
         if (data && data["metadata"]) {
             let buffer = Buffer.from(JSON.stringify(data["metadata"]));
             //console.log(`saveIdsToJson ---2`)
