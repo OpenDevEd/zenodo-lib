@@ -48,7 +48,7 @@ export function loadConfig(args) {
       "config.json",
       "zenodo-config.json",
       "zenodo_config.json",
-      `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`
+      `${os.homedir()}/.config/zenodo-cli/config.json`
     ].find(cfg => fs.existsSync(cfg))
 
   /*
