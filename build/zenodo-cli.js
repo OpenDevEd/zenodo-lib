@@ -59,7 +59,7 @@ function getArguments() {
         "help": "API key for Zenodo. If provided, overrides --config file and --config-json."
     });
     parser.add_argument("--sandbox", {
-        "action": "store__true",
+        "action": "store_true",
         "help": "Indicate that the Zenodo API key provided is for the Zenodo sandbox. If provided, it overrides --zenodo-config file and --zenodo-config-json."
     });
     parser.add_argument("--verbose", {
