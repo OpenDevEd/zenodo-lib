@@ -13,7 +13,7 @@ async function main() {
         console.log(JSON.stringify(list[0], null, 2))
     }
     */
-    const access_token = "6JciD0YQavXuXd2RGjmto4C7oToln6QYn8poOOB34urPIViyvA35waVXsQuQ"
+    const access_token = "your api key / access token here"
     access_token_v1: {
         console.log("access_token")
         const list = await zenodolib.list({ access_token: access_token })
