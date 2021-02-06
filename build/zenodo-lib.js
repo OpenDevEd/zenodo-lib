@@ -124,7 +124,7 @@ async function apiCallFileUpload(args, options, fullResponse = false) {
 }
 async function publishDeposition(args, id) {
     id = helper_1.parseId(id);
-    const { zenodoAPIUrl, params } = helper_1.loadConfig(args.config);
+    const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
     if ("verbose" in args && args.verbose) {
         console.log(`publishDeposition`);
     }
@@ -144,7 +144,7 @@ async function showDeposition(args, id) {
     helper_1.showDepositionJSON(info);
 }
 async function getData(args, id) {
-    const { zenodoAPIUrl, params } = helper_1.loadConfig(args.config);
+    const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
     helper_1.myverbose(args, `getting data for ${id}`, null);
     id = helper_1.parseId(id);
     helper_1.myverbose(args, `ParseID for ${id}`, null);
@@ -192,7 +192,7 @@ async function getMetadata(args, id) {
 async function createRecord(args, metadata) {
     console.log("Creating record.");
     helper_1.mydebug(args, "zenodo.createRecord", args);
-    const { zenodoAPIUrl, params } = helper_1.loadConfig(args.config);
+    const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
     /*
       console.log(`URI:    ${zenodoAPIUrl}`)
       const zenodoAPIUrlWithToken = zenodoAPIUrl+"?access_token="+params["access_token"]
@@ -244,7 +244,7 @@ async function editDeposit(args, dep_id) {
     Body: a deposition resource.
     */
     console.log("\tMaking deposit editable (actions/edit).");
-    const { params, zenodoAPIUrl } = helper_1.loadConfig(args.config);
+    const { params, zenodoAPIUrl } = helper_1.loadConfig(args);
     const options = {
         method: 'post',
         url: `${zenodoAPIUrl}/${helper_1.parseId(dep_id)}/actions/edit`,
@@ -257,7 +257,7 @@ async function editDeposit(args, dep_id) {
 async function updateRecord(args, dep_id, metadata) {
     console.log("Updating record.");
     //-->
-    const { params, zenodoAPIUrl } = helper_1.loadConfig(args.config);
+    const { params, zenodoAPIUrl } = helper_1.loadConfig(args);
     const payload = { "metadata": metadata };
     const options = {
         method: 'put',
@@ -270,7 +270,7 @@ async function updateRecord(args, dep_id, metadata) {
     return responseDataFromAPIcall;
 }
 async function fileUpload(args, bucket_url, journal_filepath) {
-    const { params } = helper_1.loadConfig(args.config);
+    const { params } = helper_1.loadConfig(args);
     console.log("Uploading file.");
     const fileName = journal_filepath.replace("^.*\\/", "");
     console.log(`----------> ${journal_filepath}`);
@@ -668,7 +668,7 @@ async function listDepositions(args, subparsers) {
     }
     // listDepositions: check arguments
     helper_1.mydebug(args, "listDepositions", args);
-    const { zenodoAPIUrl, params } = helper_1.loadConfig(args.config);
+    const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
     params["page"] = args.page;
     params["size"] = (args.size ? args.size : 1000);
     // actions
@@ -700,9 +700,13 @@ async function listDepositions(args, subparsers) {
     if (res.length > 0) {
         var newres = [];
         await res.forEach(async function (item) {
-            console.log(item["record_id"], item["conceptrecid"]);
+            // console.log(item["record_id"], item["conceptrecid"]);
             const resfa = finalActions2(args, item);
-            newres.push(resfa);
+            newres.push({
+                record_id: item["record_id"],
+                concept_id: item["conceptrecid"],
+                finalactions: resfa
+            });
         });
         // TODO - check. This is the right array, but contains a promise... ?
         helper_1.mydebug(args, "listDepositions: final", newres);
@@ -745,7 +749,7 @@ async function newVersion(args, subparsers) {
     }
     // ACTION: check arguments
     // ACTIONS...
-    const { zenodoAPIUrl, params } = helper_1.loadConfig(args.config);
+    const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
     const id = helper_1.parseId(args.id[0]);
     // Let's check a new version is possible.
     const data = await getData(args, id);
@@ -796,7 +800,7 @@ async function download(args, subparsers) {
     var data, id, name;
     id = helper_1.parseId(args.id[0]);
     data = await getData(args, id);
-    const { params } = helper_1.loadConfig(args.config);
+    const { params } = helper_1.loadConfig(args);
     //IF NO uploaded files: data["files"] => undefined.
     if (data["files"]) { //the record should be [published] to have this option.
         data["files"].forEach(async function (fileObj) {
@@ -887,7 +891,7 @@ async function concept(args, subparsers) {
     }
     // ACTION: check arguments
     // ACTIONS...
-    const { zenodoAPIUrl, params } = helper_1.loadConfig(args.config);
+    const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
     params["q"] = `conceptrecid:${helper_1.parseId(args.id[0])}`;
     const res = await axios_1.default.get(zenodoAPIUrl, { "params": params });
     if ((res.status !== 200)) {

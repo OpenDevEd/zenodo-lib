@@ -4,8 +4,6 @@ import * as argparse from 'argparse';
 
 // PRODUCTION: Load library
 const zenodolib = require("./zenodo-lib");
-// TESTING: Load locally for testing
-//   const zenodolib = require("../zenodo-lib/functions");
 
 /*
 import {

@@ -19,23 +19,143 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.myverbose = exports.mydebug = exports.updateMetadata = exports.parseIds = exports.dumpJSON = exports.showDepositionJSON = exports.parseId = exports.loadConfig = void 0;
+exports.myverbose = exports.mydebug = exports.updateMetadata = exports.parseIds = exports.dumpJSON = exports.showDepositionJSON = exports.parseId = exports.loadConfig = exports.get_array = exports.get_value = void 0;
 const fs = __importStar(require("fs"));
-const FALLBACK_CONFIG_FILE = (process.env.HOME + "/.config/zenodo-cli/config.json");
-function loadConfig(configFile) {
-    //console.log("load file checking ...")
-    if (fs.statSync(FALLBACK_CONFIG_FILE).isFile()) {
-        configFile = FALLBACK_CONFIG_FILE;
+const os = __importStar(require("os"));
+function get_value(value) {
+    if (Array.isArray(value)) {
+        value = value[0];
     }
     else {
-        console.log(`Config file not present at config.json or ${FALLBACK_CONFIG_FILE}`);
+    }
+    return value;
+}
+exports.get_value = get_value;
+function get_array(value) {
+    let out = [];
+    if (value) {
+        if (!Array.isArray(value)) {
+            out = [value];
+        }
+        else {
+            out = value;
+        }
+    }
+    return out;
+}
+exports.get_array = get_array;
+function loadConfig(args) {
+    const config_keys = ["api-key", "env", "accessToken", "access-token"];
+    // Step 1. Read config files
+    // const FALLBACK_CONFIG_FILE = (process.env.HOME + "/.config/zenodo-cli/config.json");
+    //console.log("load file checking ...")
+    /*
+    let configFile =
+      args.config ? args.config :
+        args.zenodo_config ? args.zenodo_config :
+          fs.statSync(FALLBACK_CONFIG_FILE).isFile() ? FALLBACK_CONFIG_FILE :
+            fs.statSync("config.json").isFile() ? "config.json" :
+              fs.statSync("zenodo-config.json").isFile() ? "zenodo-config.json" :
+                fs.statSync("zenodo_config.json").isFile() ? "zenodo_config.json" :
+                  null
+    */
+    const configFile = [
+        args.config,
+        args.zenodo_config,
+        "config.json",
+        "zenodo-config.json",
+        "zenodo_config.json",
+        `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`
+    ].find(cfg => fs.existsSync(cfg));
+    /*
+    if (args.config) {
+      const config: string = [args.config, 'zotero-cli.toml', `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`].find(cfg => fs.existsSync(cfg))
+      this.config = config ? toml.parse(fs.readFileSync(config, 'utf-8')) : {}
+    }
+    */
+    let config = {
+        accessToken: "",
+        env: ""
+    };
+    if (configFile) {
+        console.log(configFile);
+        const content = fs.readFileSync(configFile, "utf8");
+        config = JSON.parse(content);
+    }
+    // STEP 2. Apply --config_json option
+    if (args.config_json) {
+        console.log(`Setting from config_json`);
+        const confobj = typeof (args.config_json) == "string" ? JSON.parse(args.config_json) : args.config_json;
+        Object.keys(confobj).forEach(x => {
+            console.log(`Setting: ${x}`);
+            config[x] = confobj[x];
+        });
+    }
+    // STEP 3. Canonical forms.
+    // Change "-" to "_"
+    config_keys.forEach(key => {
+        const key_zenodo = "zenodo-" + key;
+        const key_underscore = key.replace(/\-/g, "_");
+        const key_zenodo_underscore = key_zenodo.replace(/\-/g, "_");
+        /*
+        api-key
+        api_key
+        zenodo-api-key
+        zenodo_api_key
+        --> api_key
+        */
+        // console.log(key_underscore+ " "+key_zenodo_underscore)
+        if (key != key_underscore) {
+            // Fix existing config
+            if (config[key]) {
+                config[key_underscore] = config[key];
+                delete this.config[key];
+            }
+            // Fix existing arg
+            if (args[key]) {
+                args[key_underscore] = args[key];
+                delete args[key];
+            }
+        }
+        else {
+            // Key is underscored already - nothing to do.
+        }
+        // Now we just have the underscore form of the key.
+        // If there is a "zotero-" form, copy to "zotero_" form.
+        if (args[key_zenodo]) {
+            args[key_zenodo_underscore] = args[key_zenodo];
+            delete args[key_zenodo];
+        }
+        // If there is a key_zotero_underscore, let it override key_underscore
+        if (args[key_zenodo_underscore]) {
+            args[key_underscore] = args[key_zenodo_underscore];
+            // retain the key.
+        }
+        // finally, copy available value to config:
+        if (args[key_underscore]) {
+            args[key_underscore] = get_value(args[key_underscore]);
+            config[key_underscore] = args[key_underscore];
+        }
+    });
+    if (config["api_key"]) {
+        config.accessToken = config["api_key"];
+        delete config["api_key"];
+    }
+    if (config["access_token"]) {
+        config.accessToken = config["access_token"];
+        delete config["access_token"];
+    }
+    if (config["sandbox"]) {
+        config.env = "sandbox";
+        delete config["sandbox"];
+    }
+    if (!config["accessToken"] || config["accessToken"] == "") {
+        console.log("Invalid config");
         process.exit(1);
     }
-    const content = fs.readFileSync(configFile, "utf8");
-    const config = JSON.parse(content);
     const params = { "access_token": config["accessToken"] };
     let zenodoAPIUrl = "";
-    if ((config["env"] === "sandbox")) {
+    if (config["env"] === "sandbox") {
         zenodoAPIUrl = "https://sandbox.zenodo.org/api/deposit/depositions";
     }
     else {

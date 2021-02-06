@@ -23,8 +23,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const argparse = __importStar(require("argparse"));
 // PRODUCTION: Load library
 const zenodolib = require("./zenodo-lib");
-// TESTING: Load locally for testing
-//   const zenodolib = require("../zenodo-lib/functions");
 /*
 import {
   concept,
@@ -51,6 +49,18 @@ function getArguments() {
         "action": "store",
         "default": "config.json",
         "help": "Config file with API key. By default config.json then ~/.config/zenodo-cli/config.json are used if no config is provided."
+    });
+    parser.add_argument("--config-json", {
+        "action": "store",
+        "help": "Config string/object with API key.E.g., '{\"accessToken\": \"...\", \"env\": \"sandbox\"}'. Note: Elements override --config. On the command line, pass a string. For library use, pass string or object."
+    });
+    parser.add_argument("--api-key", {
+        "action": "store",
+        "help": "API key for Zenodo. If provided, overrides --config file and --config-json."
+    });
+    parser.add_argument("--sandbox", {
+        "action": "store__true",
+        "help": "Indicate that the Zenodo API key provided is for the Zenodo sandbox. If provided, it overrides --zenodo-config file and --zenodo-config-json."
     });
     parser.add_argument("--verbose", {
         "action": "store_true",
