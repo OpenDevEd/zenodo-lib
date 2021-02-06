@@ -123,10 +123,14 @@ async function run() {
         // ZenodoAPI.${args.func.name}(args)
         const result = await args.func(args);
         //const result = await ZenodoAPI(args);
-        if (args.verbose || args.func.name == "listDepositions") {
+        if (args.verbose) {
             console.log(`zenodo-cli result=${JSON.stringify(result, null, 2)}`);
         }
         ;
+        if (args.func.name == "listDepositions") {
+            // TODO: Just list the ids in pairs.
+            console.log(`zenodo-cli result=${JSON.stringify(result, null, 2)}`);
+        }
     }
     return 0;
 }
