@@ -45,7 +45,7 @@ function get_array(value) {
 }
 exports.get_array = get_array;
 function loadConfig(args) {
-    const config_keys = ["api-key", "env", "accessToken", "access-token"];
+    const config_keys = ["api-key", "env", "accessToken", "access-token", "sandbox"];
     // Step 1. Read config files
     // const FALLBACK_CONFIG_FILE = (process.env.HOME + "/.config/zenodo-cli/config.json");
     //console.log("load file checking ...")
@@ -87,7 +87,7 @@ function loadConfig(args) {
         console.log(`Setting from config_json`);
         const confobj = typeof (args.config_json) == "string" ? JSON.parse(args.config_json) : args.config_json;
         Object.keys(confobj).forEach(x => {
-            console.log(`Setting: ${x}`);
+            //console.log(`Setting: ${x}`)
             config[x] = confobj[x];
         });
     }

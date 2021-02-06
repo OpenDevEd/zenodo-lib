@@ -54,9 +54,9 @@ function getArguments() {
         "action": "store",
         "help": "Config string/object with API key.E.g., '{\"accessToken\": \"...\", \"env\": \"sandbox\"}'. Note: Elements override --config. On the command line, pass a string. For library use, pass string or object."
     });
-    parser.add_argument("--api-key", {
+    parser.add_argument("--access-token", {
         "action": "store",
-        "help": "API key for Zenodo. If provided, overrides --config file and --config-json."
+        "help": "Access token (API key) for Zenodo. If provided, overrides --config file and --config-json."
     });
     parser.add_argument("--sandbox", {
         "action": "store_true",
@@ -123,7 +123,7 @@ async function run() {
         // ZenodoAPI.${args.func.name}(args)
         const result = await args.func(args);
         //const result = await ZenodoAPI(args);
-        if (args.verbose) {
+        if (args.verbose || args.func.name == "listDepositions") {
             console.log(`zenodo-cli result=${JSON.stringify(result, null, 2)}`);
         }
         ;

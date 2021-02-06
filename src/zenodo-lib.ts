@@ -652,7 +652,7 @@ export async function copy(args, subparsers) {
 export async function listDepositions(args, subparsers?) {
   // listDepositions: define CLI interface
   if (args.getInterface && subparsers) {
-    const parser_list = subparsers.add_parser("list", { "help": "List deposits for this account. Note that the Zenodo API does not seem to send continuation tokens. The first 1000 results are retrieved. Please use --page to retrieve more. The result is the record id, followed by the helper id." });
+    const parser_list = subparsers.add_parser("list", { "help": "List deposits for this account. Note that the Zenodo API does not seem to send continuation tokens. The first 1000 results are retrieved. Please use --page to retrieve more. The result is the record id, followed by the concept id." });
     parser_list.set_defaults({ "func": listDepositions });
     //zenodolib.listDepositions({getInterface: true}, parser_list)
     //parser_list.set_defaults({ "action": "listDepositions" });
