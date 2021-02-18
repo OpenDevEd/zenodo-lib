@@ -17,9 +17,14 @@ export declare function copy(args: any, subparsers: any): Promise<0 | {
     message: string;
 }>;
 export declare function listDepositions(args: any, subparsers?: any): Promise<any>;
-export declare function newVersion(args: any, subparsers: any): Promise<0 | {
+export declare function newVersion(args: any, subparsers: any): Promise<{
     status: number;
     message: string;
+    response?: undefined;
+} | {
+    status: number;
+    message: string;
+    response: any;
 }>;
 export declare function download(args: any, subparsers: any): Promise<0 | {
     status: number;
