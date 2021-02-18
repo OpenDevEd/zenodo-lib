@@ -798,7 +798,11 @@ export async function newVersion(args, subparsers) {
   const metadata = responseDataFromAPIcall["metadata"];
   const newmetadata = updateMetadata(args, metadata);
   if ((newmetadata !== metadata)) {
+    delete newmetadata.do
+    delete newmetadata.prereserve_doi
+    console.log("newmeta="+JSON.stringify(   newmetadata        ,null,2))     
     response_data = updateRecord(args, id, newmetadata);
+    console.log("newmeta="+JSON.stringify(   response_data         ,null,2))     
   }
   const bucket_url = response_data["links"]["bucket"];
   const deposit_url = response_data["links"]["latest_html"];
