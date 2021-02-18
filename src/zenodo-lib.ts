@@ -719,7 +719,8 @@ export async function listDepositions(args, subparsers?) {
       newres.push({
         record_id: item["record_id"],
         concept_id: item["conceptrecid"],
-        finalactions: resfa});
+        finalactions: resfa
+      });
     });
     // TODO - check. This is the right array, but contains a promise... ?
     mydebug(args, "listDepositions: final", newres)
@@ -763,7 +764,7 @@ export async function newVersion(args, subparsers) {
   // ACTION: check arguments
   // ACTIONS...
   const { zenodoAPIUrl, params } = loadConfig(args);
-  const id = parseId(args.id[0]);
+  let id = parseId(args.id[0]);
   // Let's check a new version is possible.
   const data = await getData(args, id)
   if (!(data["state"] == "done" && data["submitted"])) {
@@ -778,9 +779,22 @@ export async function newVersion(args, subparsers) {
     headers: { 'Content-Type': "application/json" },
   }
   const responseDataFromAPIcall = await apiCall(args, options);
-  console.log(responseDataFromAPIcall);
+  //console.log(responseDataFromAPIcall);
   //return responseDataFromAPIcall;
   let response_data = responseDataFromAPIcall;
+  console.log("latest_draft: ", response_data["links"]["latest_draft"]);
+  const latest = response_data["links"]["latest_draft"]
+  var newid = latest.match(/(\d+)$/)
+  if (newid) {
+    if (id != newid[1]) {
+      id = newid[1]
+      console.log("Moving forward to new record: " + id)
+    } else {
+      console.log("Unable to determine new id (no record created)")
+    }
+  } else {
+    console.log("Unable to determine new id")
+  }
   const metadata = responseDataFromAPIcall["metadata"];
   const newmetadata = updateMetadata(args, metadata);
   if ((newmetadata !== metadata)) {
@@ -798,8 +812,12 @@ export async function newVersion(args, subparsers) {
   }
 
   await finalActions(args, response_data["id"], deposit_url);
-  console.log("latest_draft: ", response_data["links"]["latest_draft"]);
-  return 0
+
+  return {
+    status: 0,
+    message: "",
+    response: response_data
+  }
 }
 
 export async function download(args, subparsers) {
