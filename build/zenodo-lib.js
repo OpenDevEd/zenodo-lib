@@ -774,6 +774,7 @@ async function newVersion(args, subparsers) {
     if (newid) {
         if (id != newid[1]) {
             id = newid[1];
+            args.id = id;
             console.log("Moving forward to new record: " + id);
         }
         else {
@@ -786,11 +787,15 @@ async function newVersion(args, subparsers) {
     const metadata = responseDataFromAPIcall["metadata"];
     const newmetadata = helper_1.updateMetadata(args, metadata);
     if ((newmetadata !== metadata)) {
-        delete newmetadata.do;
-        delete newmetadata.prereserve_doi;
-        console.log("newmeta=" + JSON.stringify(newmetadata, null, 2));
+        //delete newmetadata.do
+        //delete newmetadata.prereserve_doi
+        //console.log("newmeta="+JSON.stringify(   newmetadata        ,null,2))     
         response_data = updateRecord(args, id, newmetadata);
-        console.log("newmeta=" + JSON.stringify(response_data, null, 2));
+        //console.log("newmeta="+JSON.stringify(   response_data         ,null,2))     
+    }
+    else {
+        //retrieve the record again
+        response_data = getRecord(args);
     }
     const bucket_url = response_data["links"]["bucket"];
     const deposit_url = response_data["links"]["latest_html"];
