@@ -11,11 +11,12 @@ async function main() {
     // This returns one record.
     let record = {}
     record = await zenodo.create({ title: "My test item." })
-    console.log("TEMPORARY=" + JSON.stringify(record, null, 2))
+    //console.log("TEMPORARY=" + JSON.stringify(record, null, 2))
     // process.exit(1)
     const id = record.id
     //let [ state , submitted ] = [record.state, record.submitted]
     console.log(`id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
+    // Strange issue with the API - the record isn't immediately available for querying - using 'strict' might help?
     await new Promise(resolve => setTimeout(resolve, 1000));
     // This might return more than one:
     record = (await zenodo.record({ id: id }))[0]
@@ -24,16 +25,19 @@ async function main() {
     record = await zenodo.update({ id: id, title: "Amended title" })
     console.log(`id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
     console.log('upload')
-    record = await zenodo.upload({ id: id, file: "a.txt"})
-    //console.log("TEMPORARY/main=" + JSON.stringify(record, null, 2))
-
     // File upload.
-    // ...
+    record = await zenodo.upload({ id: id, files: "a.txt"})
     // Submit record
-    // ...
+    console.log('publishing...')
+    record = (await zenodo.record({ id: id, publish: true }))[0]
+    // ^^^ the record returned here is the record before final actions - should use the record returned by final actions.
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    record = (await zenodo.record({ id: id }))[0]
+    // The record is now published.
+    console.log(`Published: id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
     // New version
-    // ...
-
+    record = (await zenodo.newVersion({ id: [id], deletefiles: true }))
+    //console.log("TEMPORARY/main=" + JSON.stringify(record, null, 2))
     //console.log(`id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
 }
 

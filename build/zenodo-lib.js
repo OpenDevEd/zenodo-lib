@@ -546,7 +546,9 @@ async function upload(args, subparsers) {
         return { status: 0, message: "success" };
     }
     // ACTION: check arguments
-    // ACTIONS...
+    if ("files" in args)
+        args.files = helper_1.get_array(args.files);
+    // ACTIONS...  
     let bucket_url, deposit_url, response;
     if ("bucketurl" in args && args.bucketurl) {
         bucket_url = args.bucketurl;
@@ -556,7 +558,7 @@ async function upload(args, subparsers) {
             // Problem - for the response to include the bucket url, the requeste may not work like this...
             args.strict = true;
             response = await getData(args, args.id);
-            console.log("TEMPORARY XXX=" + JSON.stringify(response, null, 2));
+            //console.log("TEMPORARY XXX=" + JSON.stringify(response, null, 2))
             bucket_url = response["links"]["bucket"];
             deposit_url = response["links"]["html"];
         }
@@ -858,21 +860,33 @@ async function newVersion(args, subparsers) {
         //delete newmetadata.do
         //delete newmetadata.prereserve_doi
         //console.log("newmeta="+JSON.stringify(   newmetadata        ,null,2))     
-        response_data = updateRecord(args, id, newmetadata);
+        response_data = await updateRecord(args, id, newmetadata);
         //console.log("newmeta="+JSON.stringify(   response_data         ,null,2))     
     }
     else {
         //retrieve the record again
-        response_data = getRecord(args);
+        args.strict = true;
+        response_data = await getRecord(args, args.id);
     }
-    const bucket_url = response_data["links"]["bucket"];
+    response_data = response_data[0];
+    //console.log("TEMPORARY="+JSON.stringify(    response_data        ,null,2))
+    if ("deletefiles" in args && args.deletefiles) {
+        const id = response_data.id;
+        response_data.files.forEach(file => {
+            const file_id = file.id;
+            // await deletefile(id, file_id)
+            // -> DELETE /api/deposit/depositions/:id/files/:file_id
+            console.log(`DELETE /api/deposit/depositions/${id}/files/${file_id}`);
+        });
+    }
     const deposit_url = response_data["links"]["latest_html"];
     if (args.files) {
+        const bucket_url = response_data["links"]["bucket"];
         args.files.forEach(async function (filePath) {
             await fileUpload(args, bucket_url, filePath);
         }).then(async () => {
             await finalActions(args, response_data["id"], deposit_url);
-            console.log("latest_draft: ", response_data["links"]["latest_draft"]);
+            console.log("latest_draft: ", deposit_url);
         });
     }
     await finalActions(args, response_data["id"], deposit_url);
