@@ -1,3 +1,11 @@
+export declare function about(args: any, subparsers?: any): Promise<{
+    access_token: string;
+    env: string;
+    zenodoAPIUrl: string;
+} | {
+    status: number;
+    message: string;
+}>;
 export declare function getRecord(args: any, subparsers?: any): Promise<any[] | {
     status: number;
     message: string;

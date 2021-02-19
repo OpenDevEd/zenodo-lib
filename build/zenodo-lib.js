@@ -22,8 +22,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = exports.concept = exports.download = exports.newVersion = exports.listDepositions = exports.copy = exports.update = exports.upload = exports.duplicate = exports.dumpDeposition = exports.getRecord = void 0;
+exports.create = exports.concept = exports.download = exports.newVersion = exports.listDepositions = exports.copy = exports.update = exports.upload = exports.duplicate = exports.dumpDeposition = exports.getRecord = exports.about = void 0;
 module.exports.record = getRecord;
+module.exports.about = about;
 module.exports.dump = dumpDeposition;
 module.exports.duplicate = duplicate;
 module.exports.upload = upload;
@@ -62,40 +63,72 @@ async function apiCall(args, options, fullResponse = false) {
     helper_1.mydebug(args, "zenodo-lib/apiCall-config(1): args=", args);
     helper_1.mydebug(args, "zenodo-lib/apiCall-config(2): options=", options);
     helper_1.mydebug(args, "zenodo-lib/apiCall-config(3): fullResponse=", fullResponse);
-    try {
+    if (args.verbose)
+        console.log("zenodo-lib/await axios");
+    /*  try {
         // Should this await be here?
-        const resData = await axios_1.default(options).then(res => {
-            console.log("zenodo-lib/axios->then");
-            if ("verbose" in args && args.verbose) {
-                console.log(`zenodo-lib/response status code: ${res.status}`);
-                zenodoMessage(res.status);
-            }
-            ;
-            if (fullResponse) {
-                helper_1.mydebug(args, `THEN - FINISHED - API CALL with fullresponse. res=`, res);
-                return res;
-            }
-            else {
-                helper_1.mydebug(args, `THEN - FINISHED - API CALL. res.data=`, res.data);
-                return res.data;
-            }
-        }).catch(function (err) {
-            console.log("zenodo-lib/axios->error");
-            if ("verbose" in args && args.verbose) {
-                console.log(err);
-            }
-            axiosError(err);
-            return null;
-        });
-        helper_1.mydebug(args, "zenodo-lib/apiCall-result: data=", resData);
-        helper_1.mydebug(args, `FINISHED - API CALL`, "");
-        return resData;
+  const resdata = await axios(options).then(res => {
+    if (args.verbose)
+      console.log("zenodo-lib/axios->then")
+    if ("verbose" in args && args.verbose) {
+      console.log(`zenodo-lib/response status code: ${res.status}`)
+      zenodoMessage(res.status)
     }
-    catch (e) {
-        console.log("zenodo-lib/apiCall-ERROR");
-        helper_1.mydebug(args, "zenodo-lib/Error in calling axios", e);
+    if (fullResponse) {
+      mydebug(args, `THEN - FINISHED - API CALL with fullresponse. res=`, res)
+      returndata = res;
+    } else {
+      mydebug(args, `THEN - FINISHED - API CALL. res.data=`, res.data)
+      returndata = res.data;
+    }
+  }).catch(function (err) {
+    console.log("zenodo-lib/axios->error")
+    if ("verbose" in args && args.verbose) {
+      console.log(err);
+    }
+    axiosError(err)
+    return null
+  }).then(
+    //always executed
+  } catch (E) {
+  
+  }
+  );
+  */
+    let res;
+    try {
+        res = await axios_1.default(options);
+    }
+    catch (err) {
+        //console.log("zenodo-lib/apiCall-ERROR")
+        console.log("zenodo-lib/axios->error");
+        if ("verbose" in args && args.verbose) {
+            console.log(err);
+        }
+        axiosError(err);
+        helper_1.mydebug(args, "zenodo-lib/Error in calling axios", err);
         return null;
     }
+    if ("verbose" in args && args.verbose) {
+        console.log("zenodo-lib/axios->then");
+        console.log(`zenodo-lib/response status code: ${res.status}`);
+        zenodoMessage(res.status);
+    }
+    let returndata;
+    if (fullResponse) {
+        helper_1.mydebug(args, `THEN - FINISHED - API CALL with fullresponse. res=`, res);
+        returndata = res;
+    }
+    else {
+        helper_1.mydebug(args, `THEN - FINISHED - API CALL. res.data=`, res.data);
+        returndata = res.data;
+    }
+    //if (args.verbose || args.debug)
+    //  console.log("axios/resdata=" + JSON.stringify(Object.keys(res.data), null, 2))
+    // mydebug(args, "zenodo-lib/apiCall-result: data=", res)
+    if (args.verbose || args.debug)
+        console.log("FINISHED - API CALL");
+    return returndata;
 }
 //Note: This is API call for [File upload] because the [header] is different in this case.
 async function apiCallFileUpload(args, options, fullResponse = false) {
@@ -154,14 +187,20 @@ async function getData(args, id) {
         params: params,
         headers: { 'Content-Type': "application/json" },
     };
-    //Checking Concept. 
-    options["params"]["q"] = String("conceptrecid:" + id + " OR recid:" + id);
+    if ("strict" in args && args.strict) {
+        options.url = options.url + "/" + id;
+    }
+    else {
+        //Checking Concept. 
+        options["params"]["q"] = String("conceptrecid:" + id + " OR recid:" + id);
+    }
     //const searchParams = { params };
     //searchParams["q"] = String("conceptrecid:" + id + " OR recid:" + id);
     try {
         //const responseDataFromAPIcall = await axios.get(`${zenodoAPIUrl}`, searchParams)
         const responseDataFromAPIcall = await apiCall(args, options);
-        console.log(`done`);
+        if (args.verbose)
+            console.log(`done`);
         // If the id was a conceptid, we need to let the calling function know.
         // Called id=077 
         // Function returns data anyway.
@@ -178,8 +217,9 @@ async function getData(args, id) {
         // Instead of this we could say
           console.log("WARNING: concept id provided (077). Record ID is 078. In order to use concept ids, please add the following switch: --allowconceptids ")
           */
-        helper_1.myverbose(args, "final data: ", responseDataFromAPIcall[0]);
-        return responseDataFromAPIcall[0];
+        const finaldata = "strict" in args && args.strict ? responseDataFromAPIcall : responseDataFromAPIcall[0];
+        helper_1.myverbose(args, "final data: ", finaldata);
+        return finaldata;
     }
     catch (error) {
         console.log("ERROR getData/responseDataFromAPIcall: " + error);
@@ -190,7 +230,8 @@ async function getMetadata(args, id) {
     return await getData(args, id)["metadata"];
 }
 async function createRecord(args, metadata) {
-    console.log("Creating record.");
+    if (args.verbose)
+        console.log("Creating record.");
     helper_1.mydebug(args, "zenodo.createRecord", args);
     const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
     /*
@@ -255,7 +296,8 @@ async function editDeposit(args, dep_id) {
     return responseDataFromAPIcall;
 }
 async function updateRecord(args, dep_id, metadata) {
-    console.log("Updating record.");
+    if (args.verbose)
+        console.log("Updating record.");
     //-->
     const { params, zenodoAPIUrl } = helper_1.loadConfig(args);
     const payload = { "metadata": metadata };
@@ -267,6 +309,8 @@ async function updateRecord(args, dep_id, metadata) {
         data: payload
     };
     const responseDataFromAPIcall = await apiCall(args, options);
+    //if (args.debug)
+    //  console.log("updateRecord=" + JSON.stringify(responseDataFromAPIcall, null, 2))
     return responseDataFromAPIcall;
 }
 async function fileUpload(args, bucket_url, journal_filepath) {
@@ -319,12 +363,28 @@ async function finalActions2(args, data) {
     helper_1.mydebug(args, "finalActions2, rv", return_value);
     return return_value;
 }
-// Top-level function - "zenodo-cli get'
+async function about(args, subparsers) {
+    // ACTION: define CLI interface
+    if (args.getInterface && subparsers) {
+        const parser_get = subparsers.add_parser("about", { "help": "This command returns details about the api key." });
+        parser_get.set_defaults({ "func": about });
+        return { status: 0, message: "success" };
+    }
+    const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
+    const out = {
+        zenodoAPIUrl: zenodoAPIUrl,
+        ...params
+    };
+    //console.log("TEMPORARY="+JSON.stringify(  out          ,null,2))
+    return out;
+}
+exports.about = about;
+// Top-level function - "zenodo-cli record'
 // TODO: Separate this out into getRecords and getRecord
 async function getRecord(args, subparsers) {
     // ACTION: define CLI interface
     if (args.getInterface && subparsers) {
-        const parser_get = subparsers.add_parser("record", { "help": "The get command gets the record for the ids listed, and writes these out to id1.json, id2.json etc. The id can be provided as a number, as a deposit URL or record URL" });
+        const parser_get = subparsers.add_parser("record", { "help": "This command gets the record for the ids listed, and writes these out to id1.json, id2.json etc. The id can be provided as a number, as a deposit URL or record URL" });
         parser_get.set_defaults({ "func": getRecord });
         parser_get.add_argument("id", { "nargs": "*" });
         parser_get.add_argument("--publish", {
@@ -385,6 +445,7 @@ async function getRecord(args, subparsers) {
             //console.log(`saveIdsToJson ---4`)
         }
         else {
+            console.log("DATA=" + JSON.stringify(data, null, 2));
             console.log("Request completed successfully, but no data was retrieved. Do you have access to the record?");
         }
     }
@@ -486,18 +547,24 @@ async function upload(args, subparsers) {
     }
     // ACTION: check arguments
     // ACTIONS...
-    var bucket_url, deposit_url, response;
-    bucket_url = null;
-    if (args.bucketurl) {
+    let bucket_url, deposit_url, response;
+    if ("bucketurl" in args && args.bucketurl) {
         bucket_url = args.bucketurl;
     }
     else {
         if (args.id) {
-            response = getData(args, args.id);
+            // Problem - for the response to include the bucket url, the requeste may not work like this...
+            args.strict = true;
+            response = await getData(args, args.id);
+            console.log("TEMPORARY XXX=" + JSON.stringify(response, null, 2));
             bucket_url = response["links"]["bucket"];
             deposit_url = response["links"]["html"];
         }
+        else {
+            console.log("No bucket url.");
+        }
     }
+    console.log(bucket_url);
     if (bucket_url) {
         args.files.forEach(async function (filePath) {
             await fileUpload(args, bucket_url, filePath);
@@ -505,7 +572,7 @@ async function upload(args, subparsers) {
         await finalActions(args, args.id, deposit_url);
     }
     else {
-        console.log("Unable to upload: id and bucketurl both not specified.");
+        console.log("Unable to upload: bucketurl both not specified.");
     }
     return 0;
 }
@@ -563,13 +630,14 @@ async function update(args, subparsers) {
     let metadata;
     id = helper_1.parseIds(args.id);
     data = await getData(args, id);
-    //console.log(data)
+    if (args.verbose)
+        console.log("update/data=" + JSON.stringify(data, null, 2));
     metadata = data["metadata"];
     //console.log(metadata);
     if (data.submitted == true && data.state == 'done') {
-        console.log("\tMaking record editable.");
+        console.log("Making record editable.");
         let response = await editDeposit(args, id);
-        console.log(`response editDeposit:${response}`);
+        console.log(`response editDeposit: ${response}`);
     }
     let metadataNew = await helper_1.updateMetadata(args, metadata);
     let responseUpdateRecord = await updateRecord(args, id, metadataNew);
@@ -1045,7 +1113,8 @@ async function create(args, subparsers) {
     const metadata = helper_1.updateMetadata(args, zenodoDefault);
     let response_data;
     response_data = await createRecord(args, metadata);
-    console.log("RESP: " + JSON.stringify(response_data));
+    if (args.verbose)
+        console.log("RESP: " + JSON.stringify(response_data));
     let response_data_2 = null;
     if (response_data) {
         response_data_2 = await finalActions2(args, response_data);

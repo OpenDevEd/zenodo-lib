@@ -78,13 +78,15 @@ function loadConfig(args) {
         env: ""
     };
     if (configFile) {
-        console.log(configFile);
+        if (args.verbose)
+            console.log(`Config file: ${configFile}`);
         const content = fs.readFileSync(configFile, "utf8");
         config = JSON.parse(content);
     }
     // STEP 2. Apply --config_json option
     if (args.config_json) {
-        console.log(`Setting from config_json`);
+        if (args.verbose)
+            console.log(`Setting from config_json`);
         const confobj = typeof (args.config_json) == "string" ? JSON.parse(args.config_json) : args.config_json;
         Object.keys(confobj).forEach(x => {
             //console.log(`Setting: ${x}`)
@@ -153,7 +155,7 @@ function loadConfig(args) {
         console.log("Invalid config");
         process.exit(1);
     }
-    const params = { "access_token": config["accessToken"] };
+    const params = { "access_token": config["accessToken"], "env": config["env"] };
     let zenodoAPIUrl = "";
     if (config["env"] === "sandbox") {
         zenodoAPIUrl = "https://sandbox.zenodo.org/api/deposit/depositions";
@@ -257,7 +259,8 @@ function updateMetadata(args, metadata) {
         process.exit(1);
     }
     // This function takes an existing object (metadata) and applies changes indicated by args.
-    console.log("Updating metadata");
+    if (args.verbose)
+        console.log("Updating metadata");
     let authorInformationDict, authorInfo;
     let authorProvided = false;
     authorInformationDict = {};
@@ -427,7 +430,8 @@ function updateMetadata(args, metadata) {
                 "scheme": "url"
             }];
     }
-    console.log(JSON.stringify(metadata, null, 2));
+    if (args.verbose)
+        console.log(JSON.stringify(metadata, null, 2));
     return metadata;
 }
 exports.updateMetadata = updateMetadata;

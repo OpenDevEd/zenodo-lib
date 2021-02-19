@@ -87,6 +87,7 @@ function getArguments() {
         "help": "Show version",
     });
     const subparsers = parser.add_subparsers({ "help": "sub-command help" });
+    zenodolib.about({ getInterface: true }, subparsers);
     zenodolib.list({ getInterface: true }, subparsers);
     zenodolib.record({ getInterface: true }, subparsers);
     zenodolib.create({ getInterface: true }, subparsers);
@@ -124,9 +125,10 @@ async function run() {
         const result = await args.func(args);
         //const result = await ZenodoAPI(args);
         if (args.verbose) {
-            console.log(`zenodo-cli result=${JSON.stringify(result, null, 2)}`);
+            console.log(`zenodo-cli result=`);
         }
         ;
+        console.log(`${JSON.stringify(result, null, 2)}`);
         if (args.func.name == "listDepositions") {
             // TODO: Just list the ids in pairs.
             console.log(`zenodo-cli result=${JSON.stringify(result, null, 2)}`);

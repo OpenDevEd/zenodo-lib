@@ -26,7 +26,7 @@ export function get_array(value) {
 
 
 export function loadConfig(args) {
-  const config_keys = ["api-key", "env", "accessToken", "access-token","sandbox"]
+  const config_keys = ["api-key", "env", "accessToken", "access-token", "sandbox"]
 
   // Step 1. Read config files
   // const FALLBACK_CONFIG_FILE = (process.env.HOME + "/.config/zenodo-cli/config.json");
@@ -64,14 +64,16 @@ export function loadConfig(args) {
   }
 
   if (configFile) {
-    console.log(configFile)
+    if (args.verbose)
+      console.log(`Config file: ${configFile}`)
     const content = fs.readFileSync(configFile, "utf8");
     config = JSON.parse(content);
   }
 
   // STEP 2. Apply --config_json option
   if (args.config_json) {
-    console.log(`Setting from config_json`)
+    if (args.verbose)
+      console.log(`Setting from config_json`)
     const confobj = typeof (args.config_json) == "string" ? JSON.parse(args.config_json) : args.config_json
     Object.keys(confobj).forEach(x => {
       //console.log(`Setting: ${x}`)
@@ -92,7 +94,7 @@ export function loadConfig(args) {
     zenodo_api_key
     --> api_key
     */
-   // console.log(key_underscore+ " "+key_zenodo_underscore)
+    // console.log(key_underscore+ " "+key_zenodo_underscore)
     if (key != key_underscore) {
       // Fix existing config
       if (config[key]) {
@@ -147,7 +149,7 @@ export function loadConfig(args) {
   }
 
 
-  const params = { "access_token": config["accessToken"] };
+  const params = { "access_token": config["accessToken"], "env": config["env"] };
 
   let zenodoAPIUrl = "";
   if (config["env"] === "sandbox") {
@@ -247,7 +249,8 @@ export function updateMetadata(args, metadata) {
     process.exit(1);
   }
   // This function takes an existing object (metadata) and applies changes indicated by args.
-  console.log("Updating metadata")
+  if (args.verbose)
+    console.log("Updating metadata")
   let authorInformationDict, authorInfo;
   let authorProvided = false
   authorInformationDict = {};
@@ -414,7 +417,8 @@ export function updateMetadata(args, metadata) {
       "scheme": "url"
     }];
   }
-  console.log(JSON.stringify(metadata, null, 2))
+  if (args.verbose)
+    console.log(JSON.stringify(metadata, null, 2))
   return metadata;
 }
 

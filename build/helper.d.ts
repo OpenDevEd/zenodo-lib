@@ -3,6 +3,7 @@ export declare function get_array(value: any): any[];
 export declare function loadConfig(args: any): {
     params: {
         access_token: string;
+        env: string;
     };
     zenodoAPIUrl: string;
 };
