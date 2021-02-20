@@ -315,11 +315,12 @@ async function updateRecord(args, dep_id, metadata) {
 
   const responseDataFromAPIcall = await apiCall(args, options);
 
-  //if (args.debug)
-  //  console.log("updateRecord=" + JSON.stringify(responseDataFromAPIcall, null, 2))
+  if (args.debug)
+    console.log("updateRecord=" + JSON.stringify(responseDataFromAPIcall, null, 2))
 
+  // process.exit(1)
 
-  return responseDataFromAPIcall;
+  return responseDataFromAPIcall
 }
 
 
@@ -663,11 +664,8 @@ export async function update(args, subparsers?) {
   deposit_url = responseUpdateRecord["links"]["html"];
   if (args.files) {
     args.files.forEach(async function (filePath) {
-      await fileUpload(args, bucket_url, filePath).then(async () => {
-        // TO DO:DONE
-        // Wait for promises to complete before calling final actions:
-        await finalActions(args, id, deposit_url);
-      });
+      await fileUpload(args, bucket_url, filePath)
+        // await finalActions(args, id, deposit_url);
     })
   }
   // As top-level function, execute final actions.
