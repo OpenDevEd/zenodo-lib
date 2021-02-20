@@ -32,10 +32,12 @@ export declare function newVersion(args: any, subparsers: any): Promise<{
     status: number;
     message: string;
     response?: undefined;
+    final?: undefined;
 } | {
     status: number;
     message: string;
     response: any;
+    final: any;
 }>;
 export declare function download(args: any, subparsers: any): Promise<0 | {
     status: number;

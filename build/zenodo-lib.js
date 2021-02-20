@@ -508,11 +508,11 @@ async function duplicate(args, subparsers) {
     bucket_url = response_data["links"]["bucket"];
     deposit_url = response_data["links"]["html"];
     if (args.files) {
-        args.files.forEach(async function (filePath) {
+        for (const filePath of args.files) {
             await fileUpload(args, bucket_url, filePath);
-        }).then(async () => {
-            await finalActions(args, response_data["id"], deposit_url);
-        });
+            // await finalActions(args, response_data["id"], deposit_url);
+        }
+        ;
     }
     await finalActions(args, response_data["id"], deposit_url);
     return 0;
@@ -575,10 +575,10 @@ async function upload(args, subparsers) {
         // (1) It might be good to take an MD5 sum first and then check that against what is returned.
         //     It could also be an idea to let the user submit each file with an MD5 sum.
         // (2) Check that all upload complete before the output is returned. (Should be ok, but is not tested.)
-        await args.files.forEach(async function (filePath) {
+        for (const filePath of args.files) {
             const file = await fileUpload(args, bucket_url, filePath);
             output.files.push(file);
-        });
+        }
         output.final = await finalActions(args, args.id, deposit_url);
     }
     else {
@@ -654,10 +654,10 @@ async function update(args, subparsers) {
     bucket_url = responseUpdateRecord["links"]["bucket"];
     deposit_url = responseUpdateRecord["links"]["html"];
     if (args.files) {
-        args.files.forEach(async function (filePath) {
+        for (const filePath of args.files) {
             await fileUpload(args, bucket_url, filePath);
             // await finalActions(args, id, deposit_url);
-        });
+        }
     }
     // As top-level function, execute final actions.
     await finalActions(args, id, deposit_url);
@@ -699,13 +699,13 @@ async function copy(args, subparsers) {
     delete metadata["doi"];
     delete metadata["prereserve_doi"];
     var arr = args.files;
-    arr.forEach(async function (journal_filepath) {
+    for (const journal_filepath of arr) {
         console.log(("Processing: " + journal_filepath));
         response_data = await createRecord(args, metadata);
         bucket_url = response_data["links"]["bucket"];
         await fileUpload(args, bucket_url, journal_filepath);
         await finalActions(args, response_data["id"], response_data["links"]["html"]);
-    });
+    }
     return 0;
 }
 exports.copy = copy;
@@ -887,18 +887,18 @@ async function newVersion(args, subparsers) {
     const deposit_url = response_data["links"]["latest_html"];
     if (args.files) {
         const bucket_url = response_data["links"]["bucket"];
-        args.files.forEach(async function (filePath) {
+        for (const filePath of args.files) {
             await fileUpload(args, bucket_url, filePath);
-        }).then(async () => {
-            await finalActions(args, response_data["id"], deposit_url);
-            console.log("latest_draft: ", deposit_url);
-        });
+        }
+        //  await finalActions(args, response_data["id"], deposit_url);
     }
-    await finalActions(args, response_data["id"], deposit_url);
+    const finalactions = await finalActions(args, response_data["id"], deposit_url);
+    console.log("latest_draft: ", deposit_url);
     return {
         status: 0,
         message: "",
-        response: response_data
+        response: response_data,
+        final: finalactions
     };
 }
 exports.newVersion = newVersion;
