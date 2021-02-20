@@ -123,11 +123,13 @@ const resdata = await axios(options).then(res => {
 //Note: This is API call for [File upload] because the [header] is different in this case.
 
 async function apiCallFileUpload(args, options, fullResponse = false) {
-  const payload = { "data": options.data }
+  //const payload = { "data": options.data }
+  const payload = options.data
   const destination = options.url
   const axiosoptions = { headers: { 'Content-Type': "application/octet-stream" }, params: options.params }
   console.log(`API CALL`)
-  const resData = await axios.put(destination, payload, axiosoptions).then(res => {
+  try {
+    const res = await axios.put(destination, payload, axiosoptions);
     if ("verbose" in args && args.verbose) {
       console.log(`response status code: ${res.status}`)
       zenodoMessage(res.status)
@@ -137,15 +139,12 @@ async function apiCallFileUpload(args, options, fullResponse = false) {
     } else {
       return res.data;
     }
-  }).catch(function (err) {
+  } catch (err) {
     if ("verbose" in args && args.verbose) {
       console.log(err);
     }
     axiosError(err)
-  });
-
-  return resData;
-
+  }
 }
 
 
@@ -582,15 +581,20 @@ export async function upload(args, subparsers) {
     }
   }
   console.log(bucket_url)
+  let output = { files: [], final: {} }
   if (bucket_url) {
-    args.files.forEach(async function (filePath) {
-      await fileUpload(args, bucket_url, filePath);
+    // (1) It might be good to take an MD5 sum first and then check that against what is returned.
+    //     It could also be an idea to let the user submit each file with an MD5 sum.
+    // (2) Check that all upload complete before the output is returned. (Should be ok, but is not tested.)
+    await args.files.forEach(async function (filePath) {
+      const file = await fileUpload(args, bucket_url, filePath);
+      output.files.push(file)
     })
-    await finalActions(args, args.id, deposit_url);
+    output.final = await finalActions(args, args.id, deposit_url);
   } else {
     console.log("Unable to upload: bucketurl both not specified.");
   }
-  return 0
+  return output
 }
 
 // Top-level function - "zenodo-cli update'
@@ -665,7 +669,7 @@ export async function update(args, subparsers?) {
   if (args.files) {
     args.files.forEach(async function (filePath) {
       await fileUpload(args, bucket_url, filePath)
-        // await finalActions(args, id, deposit_url);
+      // await finalActions(args, id, deposit_url);
     })
   }
   // As top-level function, execute final actions.
