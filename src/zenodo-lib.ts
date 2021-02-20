@@ -127,9 +127,10 @@ async function apiCallFileUpload(args, options, fullResponse = false) {
   const payload = options.data
   const destination = options.url
   const axiosoptions = { headers: { 'Content-Type': "application/octet-stream" }, params: options.params }
-  console.log(`API CALL`)
+  console.log(`API CALL - file upload`)
   try {
-    const res = await axios.put(destination, payload, axiosoptions);
+    const res = await axios.put(destination, payload, axiosoptions)
+    console.log("axios returns")
     if ("verbose" in args && args.verbose) {
       console.log(`response status code: ${res.status}`)
       zenodoMessage(res.status)
@@ -342,8 +343,7 @@ async function fileUpload(args, bucket_url, journal_filepath) {
 
   const responseDataFromAPIcall = await apiCallFileUpload(args, options);
 
-  console.log("UploadSuccessfully.");
-  console.log(`${destination}`)
+  console.log(`UploadSuccessfully: ${destination}`)
   return responseDataFromAPIcall
 }
 
