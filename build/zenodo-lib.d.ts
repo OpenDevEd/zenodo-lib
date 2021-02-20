@@ -15,7 +15,10 @@ export declare function duplicate(args: any, subparsers: any): Promise<0 | {
     status: number;
     message: string;
 }>;
-export declare function upload(args: any, subparsers: any): Promise<0 | {
+export declare function upload(args: any, subparsers: any): Promise<{
+    files: any[];
+    final: {};
+} | {
     status: number;
     message: string;
 }>;
