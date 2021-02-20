@@ -663,6 +663,12 @@ async function update(args, subparsers) {
     }
     // As top-level function, execute final actions.
     await finalActions(args, id, deposit_url);
+    // retrieve the record again, to get the final version after all updates... Really final actins should do that too.
+    // TODO: See whether this can be optimised.
+    data = await getData(args, id);
+    if (Array.isArray(data))
+        data = data[0];
+    responseUpdateRecord = data;
     return responseUpdateRecord;
 }
 exports.update = update;
