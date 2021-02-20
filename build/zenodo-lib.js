@@ -35,6 +35,7 @@ module.exports.newversion = newVersion;
 module.exports.download = download;
 module.exports.concept = concept;
 module.exports.create = create;
+// TODO: forEach does not work with async - systematically check replace with "for (x in arr)"" or similar
 const axios_1 = __importDefault(require("axios"));
 // import { debug as debug } from 'console';
 const fs = __importStar(require("fs"));
@@ -130,10 +131,10 @@ async function apiCall(args, options, fullResponse = false) {
         console.log("FINISHED - API CALL");
     return returndata;
 }
-//Note: This is API call for [File upload] because the [header] is different in this case.
+// Note: This is API call for [File upload] because the [header] is different in this case.
 async function apiCallFileUpload(args, options, fullResponse = false) {
     //const payload = { "data": options.data }
-    const payload = options.data;
+    const payload = fs.readFileSync(options.journal_filepath);
     const destination = options.url;
     const axiosoptions = { headers: { 'Content-Type': "application/octet-stream" }, params: options.params };
     console.log(`API CALL - file upload`);
@@ -322,7 +323,6 @@ async function fileUpload(args, bucket_url, journal_filepath) {
     console.log("Uploading file.");
     const fileName = journal_filepath.replace("^.*\\/", "");
     console.log(`----------> ${journal_filepath}`);
-    const data = fs.readFileSync(journal_filepath, 'binary');
     //console.log(data)
     const destination = `${bucket_url}/${fileName}`;
     const options = {
@@ -330,7 +330,7 @@ async function fileUpload(args, bucket_url, journal_filepath) {
         url: destination,
         params: params,
         header: { 'Content-Type': "application/octet-stream" },
-        data: data
+        journal_filepath: journal_filepath
     };
     const responseDataFromAPIcall = await apiCallFileUpload(args, options);
     console.log(`UploadSuccessfully: ${destination}`);

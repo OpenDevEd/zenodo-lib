@@ -26,7 +26,7 @@ async function main() {
     console.log(`id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
     console.log('upload')
     // File upload.
-    record = await zenodo.upload({ id: id, files: "a.txt"})
+    record = await zenodo.upload({ id: id, files: ["a.txt", "test.pdf"]})
     // Submit record
     console.log('publishing...')
     record = (await zenodo.record({ id: id, publish: true }))[0]
