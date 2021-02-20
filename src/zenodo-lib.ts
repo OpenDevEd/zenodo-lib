@@ -521,7 +521,7 @@ export async function duplicate(args, subparsers) {
   if (args.files) {
     for (const filePath of args.files) {
       await fileUpload(args, bucket_url, filePath);
-     // await finalActions(args, response_data["id"], deposit_url);
+      // await finalActions(args, response_data["id"], deposit_url);
     };
   }
   await finalActions(args, response_data["id"], deposit_url);
@@ -647,7 +647,9 @@ export async function update(args, subparsers?) {
   let metadata;
 
   id = parseIds(args.id);
-  data = await getData(args, id);
+  data = await getData(args, id)
+  if (Array.isArray(data))
+    data = data[0]
   if (args.verbose)
     console.log("update/data=" + JSON.stringify(data, null, 2))
   metadata = data["metadata"];
