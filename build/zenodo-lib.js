@@ -640,6 +640,8 @@ async function update(args, subparsers) {
     let metadata;
     id = helper_1.parseIds(args.id);
     data = await getData(args, id);
+    if (Array.isArray(data))
+        data = data[0];
     if (args.verbose)
         console.log("update/data=" + JSON.stringify(data, null, 2));
     metadata = data["metadata"];
