@@ -847,9 +847,17 @@ export async function newVersion(args, subparsers) {
   let id = parseId(args.id[0]);
   // Let's check a new version is possible.
   const data = await getData(args, id)
-  if (!(data["state"] == "done" && data["submitted"])) {
+  //if (!(data["state"] == "done" && data["submitted"])) {
+  if (!(data["state"] === "done") {
+    console.log(`The state of the record is ${data.state}.`)
+  }
+  if (!data["submitted"])) {
     console.log("This record is not final - cannot create new version.")
-    return null
+    return {
+      status: 1,
+      message: "This record is not final - cannot create new version.",
+      record: data
+    }
   }
   // New version is possible - make one.
   const options = {
