@@ -31,6 +31,13 @@ export declare function listDepositions(args: any, subparsers?: any): Promise<an
 export declare function newVersion(args: any, subparsers: any): Promise<{
     status: number;
     message: string;
+    record?: undefined;
+    response?: undefined;
+    final?: undefined;
+} | {
+    status: number;
+    message: string;
+    record: any;
     response?: undefined;
     final?: undefined;
 } | {
@@ -38,6 +45,7 @@ export declare function newVersion(args: any, subparsers: any): Promise<{
     message: string;
     response: any;
     final: any;
+    record?: undefined;
 }>;
 export declare function download(args: any, subparsers: any): Promise<0 | {
     status: number;
