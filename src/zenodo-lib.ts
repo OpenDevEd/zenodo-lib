@@ -848,10 +848,10 @@ export async function newVersion(args, subparsers) {
   // Let's check a new version is possible.
   const data = await getData(args, id)
   //if (!(data["state"] == "done" && data["submitted"])) {
-  if (!(data["state"] === "done") {
+  if (!(data["state"] === "done")) {
     console.log(`The state of the record is ${data.state}.`)
   }
-  if (!data["submitted"])) {
+  if (!data["submitted"]) {
     console.log("This record is not final - cannot create new version.")
     return {
       status: 1,

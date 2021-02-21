@@ -840,9 +840,7 @@ async function newVersion(args, subparsers) {
     if (!(data["state"] === "done")) {
         console.log(`The state of the record is ${data.state}.`);
     }
-    if (!data["submitted"])
-        ;
-    {
+    if (!data["submitted"]) {
         console.log("This record is not final - cannot create new version.");
         return {
             status: 1,
