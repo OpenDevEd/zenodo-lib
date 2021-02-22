@@ -928,7 +928,10 @@ export async function newVersion(args, subparsers) {
   //console.log("TEMPORARY="+JSON.stringify(    response_data        ,null,2))
 
   if ("deletefiles" in args && args.deletefiles) {
-    const id = response_data.id
+      const id = response_data.id
+      // TODO: Replace forEach with
+      // for (file in response_data.files) { ... }
+      // also collect return data from api call.
     response_data.files.forEach( async (file) => {
       const file_id = file.id
       // await deletefile(id, file_id)
