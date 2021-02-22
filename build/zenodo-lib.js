@@ -159,10 +159,8 @@ async function apiCallFileUpload(args, options, fullResponse = false) {
         axiosError(err);
     }
 }
-// Delete: apiCallFileDelete
+// Delete: apiCallFileDelete //  testing in progress 
 async function apiCallFileDelete(args, options, fullResponse = false) {
-    //const payload = { "data": options.data }
-    //const payload = fs.readFileSync(options.journal_filepath);
     const destination = options.url;
     const axiosoptions = { headers: { 'Content-Type': "application/octet-stream" } };
     console.log(`API CALL - file Delete`);
@@ -921,10 +919,14 @@ async function newVersion(args, subparsers) {
     //console.log("TEMPORARY="+JSON.stringify(    response_data        ,null,2))
     if ("deletefiles" in args && args.deletefiles) {
         const id = response_data.id;
+        // TODO: Replace forEach with
+        // for (file in response_data.files) { ... }
+        // also collect return data from api call.
         response_data.files.forEach(async (file) => {
             const file_id = file.id;
             // await deletefile(id, file_id)
             // -> DELETE /api/deposit/depositions/:id/files/:file_id
+            //code testing in progress ..
             const options = {
                 url: `${zenodoAPIUrl}/deposit/depositions/${id}/files/${file_id}`,
                 headers: { 'Content-Type': "application/json" },
@@ -932,6 +934,7 @@ async function newVersion(args, subparsers) {
             await apiCallFileDelete(args, options);
             console.log(`DELETE /api/deposit/depositions/${id}/files/${file_id}`);
         });
+        // Question: need to call finalActions here?
     }
     const deposit_url = response_data["links"]["latest_html"];
     if (args.files) {
