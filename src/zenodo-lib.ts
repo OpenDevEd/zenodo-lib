@@ -149,6 +149,33 @@ async function apiCallFileUpload(args, options, fullResponse = false) {
   }
 }
 
+// Delete: apiCallFileDelete //  testing in progress 
+
+async function apiCallFileDelete(args, options, fullResponse = false) {
+ 
+  const destination = options.url
+  const axiosoptions = { headers: { 'Content-Type': "application/octet-stream" } }
+  console.log(`API CALL - file Delete`)
+  try {
+    const res = await axios.delete(destination, axiosoptions)
+    console.log("axios returns")
+    if ("verbose" in args && args.verbose) {
+      console.log(`response status code: ${res.status}`)
+      zenodoMessage(res.status)
+    }
+    if (fullResponse) {
+      return res;
+    } else {
+      return res.data;
+    }
+  } catch (err) {
+    if ("verbose" in args && args.verbose) {
+      console.log(err);
+    }
+    axiosError(err)
+  }
+}
+
 
 async function publishDeposition(args, id) {
   id = parseId(id);
@@ -899,14 +926,24 @@ export async function newVersion(args, subparsers) {
   }
   response_data = response_data[0]
   //console.log("TEMPORARY="+JSON.stringify(    response_data        ,null,2))
+
   if ("deletefiles" in args && args.deletefiles) {
     const id = response_data.id
-    response_data.files.forEach(file => {
+    response_data.files.forEach( async (file) => {
       const file_id = file.id
       // await deletefile(id, file_id)
       // -> DELETE /api/deposit/depositions/:id/files/:file_id
+
+      //code testing in progress ..
+      const options = {
+        url: `${zenodoAPIUrl}/deposit/depositions/${id}/files/${file_id}`,
+        headers: { 'Content-Type': "application/json" },
+      }
+      await apiCallFileDelete(args, options);
+    
       console.log(`DELETE /api/deposit/depositions/${id}/files/${file_id}`)
     })
+    // Question: need to call finalActions here?
   }
 
   const deposit_url = response_data["links"]["latest_html"];

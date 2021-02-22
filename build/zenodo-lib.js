@@ -159,6 +159,34 @@ async function apiCallFileUpload(args, options, fullResponse = false) {
         axiosError(err);
     }
 }
+// Delete: apiCallFileDelete
+async function apiCallFileDelete(args, options, fullResponse = false) {
+    //const payload = { "data": options.data }
+    //const payload = fs.readFileSync(options.journal_filepath);
+    const destination = options.url;
+    const axiosoptions = { headers: { 'Content-Type': "application/octet-stream" } };
+    console.log(`API CALL - file Delete`);
+    try {
+        const res = await axios_1.default.delete(destination, axiosoptions);
+        console.log("axios returns");
+        if ("verbose" in args && args.verbose) {
+            console.log(`response status code: ${res.status}`);
+            zenodoMessage(res.status);
+        }
+        if (fullResponse) {
+            return res;
+        }
+        else {
+            return res.data;
+        }
+    }
+    catch (err) {
+        if ("verbose" in args && args.verbose) {
+            console.log(err);
+        }
+        axiosError(err);
+    }
+}
 async function publishDeposition(args, id) {
     id = helper_1.parseId(id);
     const { zenodoAPIUrl, params } = helper_1.loadConfig(args);
@@ -893,10 +921,15 @@ async function newVersion(args, subparsers) {
     //console.log("TEMPORARY="+JSON.stringify(    response_data        ,null,2))
     if ("deletefiles" in args && args.deletefiles) {
         const id = response_data.id;
-        response_data.files.forEach(file => {
+        response_data.files.forEach(async (file) => {
             const file_id = file.id;
             // await deletefile(id, file_id)
             // -> DELETE /api/deposit/depositions/:id/files/:file_id
+            const options = {
+                url: `${zenodoAPIUrl}/deposit/depositions/${id}/files/${file_id}`,
+                headers: { 'Content-Type': "application/json" },
+            };
+            await apiCallFileDelete(args, options);
             console.log(`DELETE /api/deposit/depositions/${id}/files/${file_id}`);
         });
     }
