@@ -17,26 +17,29 @@ async function main() {
     //let [ state , submitted ] = [record.state, record.submitted]
     console.log(`id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
     // Strange issue with the API - the record isn't immediately available for querying - using 'strict' might help?
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // await new Promise(resolve => setTimeout(resolve, 1000));
     // This might return more than one:
-    record = (await zenodo.record({ id: id }))[0]
+    record = (await zenodo.record({ id: id, strict: true }))[0]
     //console.log("main() returns")
     console.log(`id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
-    record = await zenodo.update({ id: id, title: "Amended title" })
+    record = await zenodo.update({ id: id, title: "Amended title", strict: true })
     console.log(`id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
     console.log('upload')
     // File upload.
-    record = await zenodo.upload({ id: id, files: ["resources/a.txt", "resources/test.pdf"]})
+    record = await zenodo.upload({ id: id, files: ["resources/a.txt", "resources/test.pdf"], strict: true})
     // Submit record
     console.log('publishing...')
-    record = (await zenodo.record({ id: id, publish: true }))[0]
+    record = (await zenodo.record({ id: id, publish: true, strict: true }))[0]
     // ^^^ the record returned here is the record before final actions - should use the record returned by final actions.
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    record = (await zenodo.record({ id: id }))[0]
+    // await new Promise(resolve => setTimeout(resolve, 1000));
+    record = (await zenodo.record({ id: id, strict: true }))[0]
     // The record is now published.
     console.log(`Published: id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
-    // New version
-    record = (await zenodo.newVersion({ id: [id], deletefiles: true }))
+    // Working up to here ^^^
+    // New version: Generating a new id from an old id:
+    // record = (await zenodo.newVersion({ debug: true, verbose: true, id: [id], deletefiles: true, strict: true }))
+    record = (await zenodo.newVersion({ id: [id], deletefiles: true, strict: true }))
+    console.log("complete,")
     //console.log("TEMPORARY/main=" + JSON.stringify(record, null, 2))
     //console.log(`id: ${id} (${record.state}, ${record.submitted}): ${record.title}`)
 }

@@ -32,7 +32,7 @@ import {
   mydebug,
   myverbose,
   get_array,
-  //get_value
+  get_value
 } from "./helper";
 
 /*
@@ -152,7 +152,7 @@ async function apiCallFileUpload(args, options, fullResponse = false) {
 // Delete: apiCallFileDelete //  testing in progress 
 
 async function apiCallFileDelete(args, options, fullResponse = false) {
- 
+
   const destination = options.url
   const axiosoptions = { headers: { 'Content-Type': "application/octet-stream" } }
   console.log(`API CALL - file Delete`)
@@ -211,6 +211,15 @@ async function getData(args, id) {
     params: params,
     headers: { 'Content-Type': "application/json" },
   }
+  /*
+Two ways of getting the record:
+(1) Retrieve the record directly from the ID. I can do this if I know whether the ID is a 'plain record' or a 'concept record'. 
+If I get this right, the request will fail.
+
+(2) I can retrieve the record via a search. This will always return the record (both both plain and concept). 
+However, the search index seems to take ~ 1 second to update. Therefore, if I can just created a record,
+it cannot be retrieved via this method.
+*/
   if ("strict" in args && args.strict) {
     options.url = options.url + "/" + id
   } else {
@@ -425,11 +434,17 @@ export async function about(args, subparsers?) {
 // Top-level function - "zenodo-cli record'
 // TODO: Separate this out into getRecords and getRecord
 export async function getRecord(args, subparsers?) {
+
   // ACTION: define CLI interface
   if (args.getInterface && subparsers) {
     const parser_get = subparsers.add_parser("record", { "help": "This command gets the record for the ids listed, and writes these out to id1.json, id2.json etc. The id can be provided as a number, as a deposit URL or record URL" });
     parser_get.set_defaults({ "func": getRecord });
     parser_get.add_argument("id", { "nargs": "*" });
+    parser_get.add_argument("--strict", {
+      "action": "store_true",
+      "help": "Publish the deposition after executing the command.",
+      "default": false
+    });
     parser_get.add_argument("--publish", {
       "action": "store_true",
       "help": "Publish the deposition after executing the command.",
@@ -452,6 +467,14 @@ export async function getRecord(args, subparsers?) {
     });
     return { status: 0, message: "success" }
   }
+  // check arguments
+  // args.strict is a value
+  if ("strict" in args) {
+    args.strict = get_value(args.strict);
+  } else {
+    args.strict = true;
+  }
+  //
   let data, ids;
   let output = []
   ids = parseIds(args.id)
@@ -869,11 +892,15 @@ export async function newVersion(args, subparsers) {
     return { status: 0, message: "success" }
   }
   // ACTION: check arguments
+  // TODO
   // ACTIONS...
+  // Load config.
   const { zenodoAPIUrl, params } = loadConfig(args);
-  let id = parseId(args.id[0]);
+  // ids can be provided in different ways, so we alway parse the id. // TODO: Check this is teh case for all function.
+  let id_of_old_record = parseId(args.id[0]);
+  // In order to make a new version for args.id[0], we need to check that record.
   // Let's check a new version is possible.
-  const data = await getData(args, id)
+  const data = await getData(args, id_of_old_record)
   //if (!(data["state"] == "done" && data["submitted"])) {
   if (!(data["state"] === "done")) {
     console.log(`The state of the record is ${data.state}.`)
@@ -886,13 +913,16 @@ export async function newVersion(args, subparsers) {
       record: data
     }
   }
+  // TODO: Generally across all of the zotero-lib, zenodo-lib, zotzen-lib: migrate to using console.log/error/verbose... select a package: winston
   // New version is possible - make one.
+  console.log("Trying to create new record.");
   const options = {
     method: 'post',
-    url: `${zenodoAPIUrl}/${id}/actions/newversion`,
+    url: `${zenodoAPIUrl}/${id_of_old_record}/actions/newversion`,
     params: params,
     headers: { 'Content-Type': "application/json" },
   }
+  // This is the second call to the API, to get the existing recod.
   const responseDataFromAPIcall = await apiCall(args, options);
   //console.log(responseDataFromAPIcall);
   //return responseDataFromAPIcall;
@@ -901,15 +931,17 @@ export async function newVersion(args, subparsers) {
   const latest = response_data["links"]["latest_draft"]
   var newid = latest.match(/(\d+)$/)
   if (newid) {
-    if (id != newid[1]) {
-      id = newid[1]
-      args.id = id
-      console.log("Moving forward to new record: " + id)
+    if (id_of_old_record != newid[1]) {
+      id_of_old_record = newid[1]
+      args.id = id_of_old_record
+      console.log("Moving forward to new record: " + id_of_old_record)
     } else {
       console.log("Unable to determine new id (no record created)")
+      // retun with error message
     }
   } else {
     console.log("Unable to determine new id")
+    // return with error
   }
   const metadata = responseDataFromAPIcall["metadata"];
   const newmetadata = updateMetadata(args, metadata);
@@ -917,22 +949,25 @@ export async function newVersion(args, subparsers) {
     //delete newmetadata.do
     //delete newmetadata.prereserve_doi
     //console.log("newmeta="+JSON.stringify(   newmetadata        ,null,2))     
-    response_data = await updateRecord(args, id, newmetadata);
+    response_data = await updateRecord(args, id_of_old_record, newmetadata);
     //console.log("newmeta="+JSON.stringify(   response_data         ,null,2))     
   } else {
     //retrieve the record again
     args.strict = true
     response_data = await getRecord(args, args.id)
   }
+  // Now response data holds the new record.
   response_data = response_data[0]
   //console.log("TEMPORARY="+JSON.stringify(    response_data        ,null,2))
+  console.log("Updated metadata")
 
   if ("deletefiles" in args && args.deletefiles) {
-      const id = response_data.id
-      // TODO: Replace forEach with
-      // for (file in response_data.files) { ... }
-      // also collect return data from api call.
-    response_data.files.forEach( async (file) => {
+    console.log("attempting to delete files")
+    const id = response_data.id
+    // TODO: Replace forEach with
+    // for (file in response_data.files) { ... }
+    // also collect return data from api call.
+    response_data.files.forEach(async (file) => {
       const file_id = file.id
       // await deletefile(id, file_id)
       // -> DELETE /api/deposit/depositions/:id/files/:file_id
@@ -943,12 +978,14 @@ export async function newVersion(args, subparsers) {
         headers: { 'Content-Type': "application/json" },
       }
       await apiCallFileDelete(args, options);
-    
+
       console.log(`DELETE /api/deposit/depositions/${id}/files/${file_id}`)
     })
     // Question: need to call finalActions here?
+    console.log("deletion of files complete")
   }
-
+  console.log("something wrong from here...")
+  // You have two ids: The original one, and the new one.
   const deposit_url = response_data["links"]["latest_html"];
   if (args.files) {
     const bucket_url = response_data["links"]["bucket"];
@@ -957,9 +994,13 @@ export async function newVersion(args, subparsers) {
     }
     //  await finalActions(args, response_data["id"], deposit_url);
   }
-
-  const finalactions = await finalActions(args, response_data["id"], deposit_url);
-  console.log("latest_draft: ", deposit_url);
+  args.id = response_data["id"]
+  // Task 1: Determine the correct deposit_url
+  const deposit_url_2 = response_data["id"]["deposit_url"]
+  // Task 2: There is a problem with await in finalAction
+  const finalactions = await finalActions(args, response_data["id"], deposit_url_2);
+  console.log("latest_draft: ", deposit_url_2);
+  console.log("Done");
   return {
     status: 0,
     message: "",
