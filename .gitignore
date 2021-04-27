@@ -4,6 +4,7 @@ node_modules/*
 BaCkUp
 BaCkUp/*
 */BaCkUp/*
+build/*
 *~
 */*~
 */*/*~

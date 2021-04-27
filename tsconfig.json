@@ -17,11 +17,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "./src/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "./src/BaCkUp/*"
-  ]
+  "include": ["./src/*.ts"],
+  "exclude": ["node_modules"]
 }
