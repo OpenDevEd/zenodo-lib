@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 import * as argparse from 'argparse';
+import { version } from '../package.json';
 import logger = require('./logger');
-
-// PRODUCTION: Load library
 import zenodolib = require('./zenodo-lib');
 
+// PRODUCTION: Load library
 /*
 import {
   concept,
@@ -22,9 +22,10 @@ import {
 */
 
 function getVersion() {
-  const pjson = require('../package.json');
-  if (pjson.version) console.log(`zenodo-lib version=${pjson.version}`);
-  return pjson.version;
+  if (version) {
+    return logger.info(`zenodo-lib version=${version}`);
+  }
+  return version;
 }
 
 function getArguments() {
@@ -102,9 +103,9 @@ function getArguments() {
 
 // --- main ---
 async function run() {
-  var args = getArguments();
+  const args = getArguments();
   if (args.verbose) {
-    console.log('zenodo-cli starting...');
+    logger.info('zenodo-cli starting...');
   }
   if (args.version) {
     getVersion();
@@ -112,7 +113,7 @@ async function run() {
   }
   // zenodo-cli create --title "..." --authors "..." --dryrun
   if (args.dryrun) {
-    console.log(
+    logger.info(
       `API command:\n zenodolib.${args.func.name}(${JSON.stringify(
         args,
         null,
@@ -122,14 +123,14 @@ async function run() {
   } else {
     // ZenodoAPI.${args.func.name}(args)
     const result = await args.func(args);
-    //const result = await ZenodoAPI(args);
+    // const result = await ZenodoAPI(args);
     if (args.verbose) {
-      console.log(`zenodo-cli result=`);
+      logger.info('zenodo-cli result=');
     }
-    console.log(`${JSON.stringify(result, null, 2)}`);
-    if (args.func.name == 'listDepositions') {
+    logger.info(`${JSON.stringify(result, null, 2)}`);
+    if (args.func.name === 'listDepositions') {
       // TODO: Just list the ids in pairs.
-      // console.log(`zenodo-cli result=${JSON.stringify(result, null, 2)}`);
+      // logger.info(`zenodo-cli result=${JSON.stringify(result, null, 2)}`);
     }
   }
   return 0;
