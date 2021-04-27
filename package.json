@@ -36,13 +36,14 @@
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",
     "typescript": "^3.9.7"
   },
   "scripts": {
     "dev": "ts-node ./src/zenodo-cli.ts",
     "start": "node ./build/zenodo-cli.js",
-    "build": "tsc --project ./tsconfig.json",
+    "build": "rimraf build/ && tsc",
     "test": "jest",
     "prepare": "npm run build",
     "version:old": "git add -A src",
