@@ -7,14 +7,6 @@ function getLogingLevel() {
     level = 'error';
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    level = 'debug';
-  }
-
-  if (process.env.NODE_ENV === 'test') {
-    level = 'error';
-  }
-
   return level;
 }
 
