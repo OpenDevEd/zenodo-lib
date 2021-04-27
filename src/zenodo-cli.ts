@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import * as argparse from 'argparse';
+import logger from './logger';
 
 // PRODUCTION: Load library
 const zenodolib = require('./zenodo-lib');
@@ -75,7 +76,6 @@ function getArguments() {
   parser.add_argument('--version', {
     action: 'store_true',
     help: 'Show version',
-    default: true,
   });
 
   const subparsers = parser.add_subparsers({ help: 'sub-command help' });
@@ -92,8 +92,8 @@ function getArguments() {
   zenodolib.concept({ getInterface: true }, subparsers);
 
   const parsed = parser.parse_args();
-  if (process.argv.length === 1) {
-    //this function not exist
+  if (process.argv.length === 2) {
+    logger.info('No argument passed exiting with help');
     parser.print_help();
     process.exit(1);
   }
