@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import * as argparse from 'argparse';
-import { version } from '../package.json';
 import logger = require('./logger');
 import zenodolib = require('./zenodo-lib');
 
@@ -22,6 +21,7 @@ import {
 */
 
 function getVersion() {
+  const version = process.env.npm_package_version;
   if (version) {
     return logger.info(`zenodo-lib version=${version}`);
   }

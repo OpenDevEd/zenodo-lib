@@ -111,7 +111,8 @@ async function apiCallFileUpload(args, options, fullResponse = false) {
     headers: { 'Content-Type': 'application/octet-stream' },
     params: options.params,
   };
-  console.log(`API CALL - file upload`);
+  console.log(`API CALL - file upload  args = %O, options = %O`, args, options);
+
   try {
     const res = await axios.put(destination, payload, axiosoptions);
     console.log('axios returns');
@@ -138,8 +139,9 @@ async function apiCallFileDelete(args, options, fullResponse = false) {
   const destination = options.url;
   const axiosoptions = {
     headers: { 'Content-Type': 'application/octet-stream' },
+    params: options.params,
   };
-  console.log(`API CALL - file Delete`);
+  console.log(`API CALL - file delete  args = %O, options = %O`, args, options);
   try {
     const res = await axios.delete(destination, axiosoptions);
     console.log('axios returns');
@@ -373,12 +375,12 @@ async function finalActions2(args, data) {
   mydebug(args, 'finalActions2', data);
   // the record need to contains files.
   // TODO: Whether whethr this is the case?
-  let return_value = data;
+  let returnValue = data;
   const id = data['id'];
   const deposit_url = data['links']['html'];
   if ('publish' in args && args.publish) {
     // publishDeposition will change the data, hence collecting return_value
-    return_value = await publishDeposition(args, id);
+    returnValue = await publishDeposition(args, id);
   }
   if ('show' in args && args.show) {
     await showDeposition(args, id);
@@ -387,28 +389,28 @@ async function finalActions2(args, data) {
     await dumpDeposition(args, id);
   }
   if ('open' in args && args.open) {
-    //webbrowser.open_new_tab(deposit_url);
+    // webbrowser.open_new_tab(deposit_url);
     opn(deposit_url);
   }
-  mydebug(args, 'finalActions2, rv', return_value);
-  return return_value;
+  mydebug(args, 'finalActions2, rv', returnValue);
+  return returnValue;
 }
 
 export async function about(args, subparsers?) {
   // ACTION: define CLI interface
   if (args.getInterface && subparsers) {
-    const parser_get = subparsers.add_parser('about', {
+    const parserGet = subparsers.add_parser('about', {
       help: 'This command returns details about the api key.',
     });
-    parser_get.set_defaults({ func: about });
+    parserGet.set_defaults({ func: about });
     return { status: 0, message: 'success' };
   }
   const { zenodoAPIUrl, params } = loadConfig(args);
   const out = {
-    zenodoAPIUrl: zenodoAPIUrl,
+    zenodoAPIUrl,
     ...params,
   };
-  //console.log("TEMPORARY="+JSON.stringify(  out          ,null,2))
+  // console.log("TEMPORARY="+JSON.stringify(  out          ,null,2))
   return out;
 }
 
@@ -984,6 +986,7 @@ export async function newVersion(args, subparsers) {
   console.log('Updated metadata');
 
   if ('deletefiles' in args && args.deletefiles) {
+    const { params } = loadConfig(args);
     console.log('attempting to delete files');
     const id = response_data.id;
     // To check: Is this the new id -  id_for_new_record ?
@@ -1007,8 +1010,9 @@ export async function newVersion(args, subparsers) {
 
       //code testing in progress ..
       const options = {
-        url: `${zenodoAPIUrl}/deposit/depositions/${id}/files/${file_id}`,
+        url: `${zenodoAPIUrl}/${id}/files/${file_id}`,
         headers: { 'Content-Type': 'application/json' },
+        params,
       };
       deletionlog.push(await apiCallFileDelete(args, options));
 
