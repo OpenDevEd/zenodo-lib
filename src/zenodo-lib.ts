@@ -1,26 +1,9 @@
-module.exports.record = getRecord;
-module.exports.about = about;
-module.exports.dump = dumpDeposition;
-module.exports.duplicate = duplicate;
-module.exports.upload = upload;
-module.exports.update = update;
-module.exports.copy = copy;
-module.exports.list = listDepositions;
-module.exports.newversion = newVersion;
-module.exports.download = download;
-module.exports.concept = concept;
-module.exports.create = create;
-
-// TODO: forEach does not work with async - systematically check replace with "for (x in arr)"" or similar
+// TODO: forEach does not work with async - systematically check replace with "for-in"
 
 import axios from 'axios';
 // import { debug as debug } from 'console';
 import * as fs from 'fs';
 import opn from 'opn';
-//for catch:
-//import { catchError } from 'rxjs/operators';
-//for throw:
-//import { Observable, throwError } from 'rxjs';
 
 import {
   dumpJSON,
@@ -928,7 +911,8 @@ export async function newVersion(args, subparsers) {
   // ACTIONS...
   // Load config.
   const { zenodoAPIUrl, params } = loadConfig(args);
-  // ids can be provided in different ways, so we alway parse the id. // TODO: Check this is teh case for all function.
+  // ids can be provided in different ways, so we alway parse the id.
+  // TODO: Check this is the case for all function.
   let id_of_old_record = parseId(args.id[0]);
   // In order to make a new version for args.id[0], we need to check that record.
   // Let's check a new version is possible.
@@ -1427,6 +1411,26 @@ function zenodoMessage(number) {
       `${number}: Internal Server Error	Request failed, due to an internal server error. Error response NOT included. Don’t worry, Zenodo admins have been notified and will be dealing with the problem ASAP.`
     );
 }
+
+export {
+  getRecord as record,
+  dumpDeposition as dump,
+  listDepositions as list,
+  newVersion as newversion,
+};
+
+// module.exports.record = getRecord;
+// module.exports.about = about;
+// module.exports.dump = dumpDeposition;
+// module.exports.duplicate = duplicate;
+// module.exports.upload = upload;
+// module.exports.update = update;
+// module.exports.copy = copy;
+// module.exports.list = listDepositions;
+// module.exports.newversion = newVersion;
+// module.exports.download = download;
+// module.exports.concept = concept;
+// module.exports.create = create;
 
 /* OLD axios post code:
   const options = { headers: { 'Content-Type': "application/json" }, params: params }
