@@ -21,17 +21,29 @@
     "request": "^2.34",
     "request-promise-native": "^1.0.9",
     "requests": "^0.3.0",
-    "sys": "0.0.1"
+    "sys": "0.0.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/argparse": "^2.0.4",
     "@types/node": "^14.6.4",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1",
+    "ts-node": "^9.1.1",
     "typescript": "^3.9.7"
   },
   "scripts": {
+    "dev": "ts-node ./src/zenodo-cli.ts",
     "start": "node ./build/zenodo-cli.js",
     "build": "tsc --project ./tsconfig.json",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "prepare": "npm run build",
     "version:old": "git add -A src",
     "postversion": "git push && git push --tags",
