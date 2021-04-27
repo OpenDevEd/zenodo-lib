@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import * as argparse from 'argparse';
-import logger from './logger';
+import logger = require('./logger');
 
 // PRODUCTION: Load library
-const zenodolib = require('./zenodo-lib');
+import zenodolib = require('./zenodo-lib');
 
 /*
 import {
