@@ -1339,6 +1339,7 @@ async function axiosError(error) {
     console.log('Error2', JSON.stringify(error.response.errors));
     console.log('Error3', error.response.data.status);
     console.log('Error4', error.response.data.message);
+    console.log('Error5', JSON.stringify(error.response.data, null, 2));
     // if (verbose) {
     //  console.log(error.response.data);
     //  console.log(error.response.headers);
