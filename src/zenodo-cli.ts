@@ -2,7 +2,6 @@
 
 import * as argparse from 'argparse';
 import logger = require('./logger');
-import zenodolib = require('./zenodo-lib');
 import configureSubparsers = require('./subparsers/configureSubparsers');
 
 // PRODUCTION: Load library
@@ -81,8 +80,6 @@ function getArguments() {
   });
 
   configureSubparsers(parser);
-
-  zenodolib.list({ getInterface: true }, subparsers);
 
   zenodolib.copy({ getInterface: true }, subparsers);
   zenodolib.newVersion({ getInterface: true }, subparsers);
