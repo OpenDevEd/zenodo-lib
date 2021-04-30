@@ -82,7 +82,6 @@ function getArguments() {
   configureSubparsers(parser);
 
   zenodolib.download({ getInterface: true }, subparsers);
-  zenodolib.concept({ getInterface: true }, subparsers);
 
   const parsed = parser.parse_args();
   if (process.argv.length === 2) {
