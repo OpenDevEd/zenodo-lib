@@ -81,8 +81,6 @@ function getArguments() {
 
   configureSubparsers(parser);
 
-  zenodolib.download({ getInterface: true }, subparsers);
-
   const parsed = parser.parse_args();
   if (process.argv.length === 2) {
     logger.info('No argument passed exiting with help');

@@ -796,15 +796,7 @@ export async function newVersion(args, subparsers) {
   };
 }
 
-export async function download(args, subparsers) {
-  if (args.getInterface && subparsers) {
-    const parser_download = subparsers.add_parser('download', {
-      help: 'Download all the files in the deposition.',
-    });
-    parser_download.add_argument('id', { nargs: 1 });
-    parser_download.set_defaults({ func: download });
-    return { status: 0, message: 'success' };
-  }
+export async function download(args) {
   // ACTION: check arguments
   // ACTIONS...
   var data, id, name;
@@ -887,7 +879,7 @@ export async function download(args, subparsers) {
   return 0;
 }
 
-export async function concept(args, subparsers?) {
+export async function concept(args) {
   // ACTION: check arguments
   // ACTIONS...
   const { zenodoAPIUrl, params } = loadConfig(args);
