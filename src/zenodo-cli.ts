@@ -2,7 +2,7 @@
 
 import * as argparse from 'argparse';
 import logger = require('./logger');
-import zenodolib = require('./zenodo-lib');
+import configureSubparsers = require('./subparsers/configureSubparsers');
 
 // PRODUCTION: Load library
 /*
@@ -79,18 +79,7 @@ function getArguments() {
     help: 'Show version',
   });
 
-  const subparsers = parser.add_subparsers({ help: 'sub-command help' });
-  zenodolib.about({ getInterface: true }, subparsers);
-  zenodolib.list({ getInterface: true }, subparsers);
-  zenodolib.record({ getInterface: true }, subparsers);
-  zenodolib.create({ getInterface: true }, subparsers);
-  zenodolib.update({ getInterface: true }, subparsers);
-  zenodolib.duplicate({ getInterface: true }, subparsers);
-  zenodolib.upload({ getInterface: true }, subparsers);
-  zenodolib.copy({ getInterface: true }, subparsers);
-  zenodolib.newVersion({ getInterface: true }, subparsers);
-  zenodolib.download({ getInterface: true }, subparsers);
-  zenodolib.concept({ getInterface: true }, subparsers);
+  configureSubparsers(parser);
 
   const parsed = parser.parse_args();
   if (process.argv.length === 2) {
@@ -121,7 +110,6 @@ async function run() {
       )})`
     );
   } else {
-    // ZenodoAPI.${args.func.name}(args)
     const result = await args.func(args);
     // const result = await ZenodoAPI(args);
     if (args.verbose) {

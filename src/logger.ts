@@ -15,6 +15,10 @@ const logger = createLogger({
   // To see more detailed errors, change this to 'debug'
   level: getLogingLevel(),
   format: format.combine(format.splat(), format.simple()),
-  transports: [new transports.Console()],
+  transports: [
+    new transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new transports.File({ filename: 'logs/combined.log' }),
+    new transports.Console(),
+  ],
 });
 export = logger;
