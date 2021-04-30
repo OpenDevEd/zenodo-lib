@@ -4,6 +4,7 @@ import axios from 'axios';
 // import { debug as debug } from 'console';
 import * as fs from 'fs';
 import opn from 'opn';
+import logger = require('./logger');
 
 import {
   dumpJSON,
@@ -358,9 +359,13 @@ async function fileUpload(args, bucket_url, journal_filepath) {
     header: { 'Content-Type': 'application/octet-stream' },
     journal_filepath: journal_filepath,
   };
-  const responseDataFromAPIcall = await apiCallFileUpload(args, options);
+  const responseDataFromAPIcall = await apiCallFileUpload(args, options).then(
+    (res) => {
+      logger.info(`UploadSuccessfully: ${destination}`);
+      return res;
+    }
+  );
 
-  console.log(`UploadSuccessfully: ${destination}`);
   return responseDataFromAPIcall;
 }
 
@@ -396,63 +401,18 @@ async function finalActions2(args, data) {
   return returnValue;
 }
 
-export async function about(args, subparsers?) {
-  // ACTION: define CLI interface
-  if (args.getInterface && subparsers) {
-    const parserGet = subparsers.add_parser('about', {
-      help: 'This command returns details about the api key.',
-    });
-    parserGet.set_defaults({ func: about });
-    return { status: 0, message: 'success' };
-  }
+export async function about(args) {
   const { zenodoAPIUrl, params } = loadConfig(args);
   const out = {
     zenodoAPIUrl,
     ...params,
   };
-  // console.log("TEMPORARY="+JSON.stringify(  out          ,null,2))
   return out;
 }
 
 // Top-level function - "zenodo-cli record'
 // TODO: Separate this out into getRecords and getRecord
-export async function getRecord(args, subparsers?) {
-  // ACTION: define CLI interface
-  if (args.getInterface && subparsers) {
-    const parser_get = subparsers.add_parser('record', {
-      help:
-        'This command gets the record for the ids listed, and writes these out to id1.json, id2.json etc. The id can be provided as a number, as a deposit URL or record URL',
-    });
-    parser_get.set_defaults({ func: getRecord });
-    parser_get.add_argument('id', { nargs: '*' });
-    parser_get.add_argument('--strict', {
-      action: 'store_true',
-      help: 'Publish the deposition after executing the command.',
-      default: false,
-    });
-    parser_get.add_argument('--publish', {
-      action: 'store_true',
-      help: 'Publish the deposition after executing the command.',
-      default: false,
-    });
-    parser_get.add_argument('--open', {
-      action: 'store_true',
-      help: 'Open the deposition in the browser after executing the command.',
-      default: false,
-    });
-    parser_get.add_argument('--show', {
-      action: 'store_true',
-      help:
-        'Show key information for the deposition after executing the command.',
-      default: false,
-    });
-    parser_get.add_argument('--dump', {
-      action: 'store_true',
-      help: 'Show json for deposition after executing the command.',
-      default: false,
-    });
-    return { status: 0, message: 'success' };
-  }
+export async function getRecord(args) {
   // check arguments
   // args.strict is a value
   if ('strict' in args) {
@@ -460,10 +420,11 @@ export async function getRecord(args, subparsers?) {
   } else {
     args.strict = true;
   }
+
   //
-  let data, ids;
-  let output = [];
-  ids = parseIds(args.id);
+  let data;
+  const ids = parseIds(args.id);
+  const output = [];
   for (const id of ids) {
     //console.log(`saveIdsToJson ---0`)
     data = await getData(args, id);
@@ -700,9 +661,9 @@ export async function update(args, subparsers?) {
   metadata = data['metadata'];
   //console.log(metadata);
   if (data.submitted == true && data.state == 'done') {
-    console.log('Making record editable.');
+    logger.info('Making record editable.');
     let response = await editDeposit(args, id);
-    console.log(`response editDeposit: ${response}`);
+    logger.info('response editDeposit: %O', response);
   }
 
   let metadataNew = await updateMetadata(args, metadata);
@@ -975,7 +936,9 @@ export async function newVersion(args, subparsers) {
   } else {
     //retrieve the record again
     args.strict = true;
-    response_data = await getRecord(args, id_for_new_record);
+    //TODO: discuss id_for_new_record seems erroraneous here
+    // response_data = await getRecord(args, id_for_new_record);
+    response_data = await getRecord(args);
   }
   // Now response data holds the new record.
   response_data = response_data[0];
@@ -1203,87 +1166,6 @@ export async function concept(args, subparsers?) {
 
 // Top-level function - "zenodo-cli create'
 export async function create(args, subparsers?) {
-  // ACTION: define CLI interface
-  if (args.getInterface && subparsers) {
-    // Make sure these options stay in line with 'update'.
-    const parser_create = subparsers.add_parser('create', {
-      help:
-        'The create command creates new records based on the json files provided, optionally providing a title / date / description / files.',
-    });
-    parser_create.set_defaults({ func: create });
-    parser_create.add_argument('--json', {
-      action: 'store',
-      help:
-        'Path of the JSON file with the metadata for the zenodo record to be created. If this file is not provided, a template is used. The following options override settings from the JSON file / template.',
-    });
-    parser_create.add_argument('--title', {
-      action: 'store',
-      help: 'The title of the record. Overrides data provided via --json.',
-    });
-    parser_create.add_argument('--date', {
-      action: 'store',
-      help: 'The date of the record. Overrides data provided via --json.',
-    });
-    parser_create.add_argument('--description', {
-      action: 'store',
-      help:
-        'The description (abstract) of the record. Overrides data provided via --json.',
-    });
-    parser_create.add_argument('--communities', {
-      action: 'store',
-      help:
-        'Read list of communities for the record from a file. Overrides data provided via --json.',
-    });
-    parser_create.add_argument('--add-communities', {
-      nargs: '*',
-      action: 'store',
-      help:
-        'List of communities to be added to the record (provided on the command line, one by one). Overrides data provided via --json.',
-    });
-    parser_create.add_argument('--remove-communities', {
-      nargs: '*',
-      action: 'store',
-      help:
-        'List of communities to be removed from the record (provided on the command line, one by one). Overrides data provided via --json.',
-    });
-    parser_create.add_argument('--authors', {
-      nargs: '*',
-      action: 'store',
-      help:
-        "List of authors, (provided on the command line, one by one). Separate institution and ORCID with semicolon, e.g. 'Lama Yunis;University of XYZ;0000-1234-...'. (You can also use --authordata.) Overrides data provided via --json.",
-    });
-    parser_create.add_argument('--authordata', {
-      action: 'store',
-      help:
-        'A text file with a database of authors. Each line has author, institution, ORCID (tab-separated). The data is used to supplement insitution/ORCID to author names specified with --authors. Note that authors are only added to the record when specified with --authors, not because they appear in the specified authordate file. ',
-    });
-    parser_create.add_argument('--zotero-link', {
-      action: 'store',
-      help:
-        'Zotero link of the zotero record to be linked. Overrides data provided via --json.',
-    });
-    parser_create.add_argument('--publish', {
-      action: 'store_true',
-      help: 'Publish the deposition after executing the command.',
-      default: false,
-    });
-    parser_create.add_argument('--open', {
-      action: 'store_true',
-      help: 'Open the deposition in the browser after executing the command.',
-      default: false,
-    });
-    parser_create.add_argument('--show', {
-      action: 'store_true',
-      help: 'Show the info of the deposition after executing the command.',
-      default: false,
-    });
-    parser_create.add_argument('--dump', {
-      action: 'store_true',
-      help: 'Show json for deposition after executing the command.',
-      default: false,
-    });
-    return { status: 0, message: 'success' };
-  }
   // ACTION: check arguments
   mydebug(args, 'zenodolib.create', args);
   // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
