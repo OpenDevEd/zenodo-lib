@@ -471,40 +471,6 @@ export async function dumpDeposition(args, id) {
 }
 
 export async function duplicate(args, subparsers) {
-  if (args.getInterface && subparsers) {
-    // ACTION: define CLI interface
-    const parser_duplicate = subparsers.add_parser('duplicate', {
-      help:
-        'The duplicate command duplicates the id to a new id, optionally providing a title / date / description / files.',
-    });
-    parser_duplicate.add_argument('id', { nargs: 1 });
-    parser_duplicate.add_argument('--title', { action: 'store' });
-    parser_duplicate.add_argument('--date', { action: 'store' });
-    parser_duplicate.add_argument('--description', { action: 'store' });
-    parser_duplicate.add_argument('--files', { nargs: '*' });
-    parser_duplicate.add_argument('--publish', {
-      action: 'store_true',
-      help: 'Publish the deposition after executing the command.',
-      default: false,
-    });
-    parser_duplicate.add_argument('--open', {
-      action: 'store_true',
-      help: 'Open the deposition in the browser after executing the command.',
-      default: false,
-    });
-    parser_duplicate.add_argument('--show', {
-      action: 'store_true',
-      help: 'Show the info of the deposition after executing the command.',
-      default: false,
-    });
-    parser_duplicate.add_argument('--dump', {
-      action: 'store_true',
-      help: 'Show json for deposition after executing the command.',
-      default: false,
-    });
-    parser_duplicate.set_defaults({ func: duplicate });
-    return { status: 0, message: 'success' };
-  }
   // ACTION: check arguments
   // ACTIONS...
   let bucket_url, deposit_url, metadata, response_data;
@@ -527,6 +493,7 @@ export async function duplicate(args, subparsers) {
     }
   }
   await finalActions(args, response_data['id'], deposit_url);
+  // TODO: this should have proper return value other than 0
   return 0;
 }
 
