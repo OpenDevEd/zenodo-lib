@@ -598,59 +598,7 @@ export async function upload(args, subparsers) {
 }
 
 // Top-level function - "zenodo-cli update'
-export async function update(args, subparsers?) {
-  // ACTION: define CLI interface
-  if (args.getInterface && subparsers) {
-    // Make sure that the options for update and create are the same. If you add options to update, also check the update function.
-    const parser_update = subparsers.add_parser('update', {
-      help:
-        'The update command updates the id provided, with the title / date / description / files provided.',
-    });
-    parser_update.add_argument('id', { nargs: 1 });
-    parser_update.add_argument('--title', { action: 'store' });
-    parser_update.add_argument('--date', { action: 'store' });
-    parser_update.add_argument('--description', { action: 'store' });
-    parser_update.add_argument('--files', { nargs: '*' });
-    // TODO
-    parser_update.add_argument('--communities', {
-      action: 'store',
-      help:
-        'Read list of communities for the record from a file. Overrides data provided via --json.',
-    });
-    parser_update.add_argument('--add-communities', { nargs: '*' });
-    parser_update.add_argument('--remove-communities', { nargs: '*' });
-    parser_update.add_argument('--zotero-link', {
-      action: 'store',
-      help: 'Zotero link of the zotero record to be linked.',
-    });
-    parser_update.add_argument('--json', {
-      action: 'store',
-      help:
-        'Path of the JSON file with the metadata of the zenodo record to be updated.',
-    });
-    parser_update.add_argument('--publish', {
-      action: 'store_true',
-      help: 'Publish the deposition after executing the command.',
-      default: false,
-    });
-    parser_update.add_argument('--open', {
-      action: 'store_true',
-      help: 'Open the deposition in the browser after executing the command.',
-      default: false,
-    });
-    parser_update.add_argument('--show', {
-      action: 'store_true',
-      help: 'Show the info of the deposition after executing the command.',
-      default: false,
-    });
-    parser_update.add_argument('--dump', {
-      action: 'store_true',
-      help: 'Show json for deposition after executing the command.',
-      default: false,
-    });
-    parser_update.set_defaults({ func: update });
-    return { status: 0, message: 'success' };
-  }
+export async function update(args) {
   let bucket_url, data, deposit_url, id;
   let metadata;
 
