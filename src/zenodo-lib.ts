@@ -649,39 +649,6 @@ export async function listDepositions(args) {
 }
 
 export async function newVersion(args, subparsers) {
-  if (args.getInterface && subparsers) {
-    const parser_newversion = subparsers.add_parser('newversion', {
-      help:
-        'The newversion command creates a new version of the deposition with id, optionally providing a title / date / description / files.',
-    });
-    parser_newversion.add_argument('id', { nargs: 1 });
-    parser_newversion.add_argument('--title', { action: 'store' });
-    parser_newversion.add_argument('--date', { action: 'store' });
-    parser_newversion.add_argument('--description', { action: 'store' });
-    parser_newversion.add_argument('--files', { nargs: '*' });
-    parser_newversion.add_argument('--publish', {
-      action: 'store_true',
-      help: 'Publish the deposition after executing the command.',
-      default: false,
-    });
-    parser_newversion.add_argument('--open', {
-      action: 'store_true',
-      help: 'Open the deposition in the browser after executing the command.',
-      default: false,
-    });
-    parser_newversion.add_argument('--show', {
-      action: 'store_true',
-      help: 'Show the info of the deposition after executing the command.',
-      default: false,
-    });
-    parser_newversion.add_argument('--dump', {
-      action: 'store_true',
-      help: 'Show json for deposition after executing the command.',
-      default: false,
-    });
-    parser_newversion.set_defaults({ func: newVersion });
-    return { status: 0, message: 'success' };
-  }
   // ACTION: check arguments
   // TODO
   // ACTIONS...

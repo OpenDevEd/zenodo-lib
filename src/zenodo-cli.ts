@@ -81,7 +81,6 @@ function getArguments() {
 
   configureSubparsers(parser);
 
-  zenodolib.newVersion({ getInterface: true }, subparsers);
   zenodolib.download({ getInterface: true }, subparsers);
   zenodolib.concept({ getInterface: true }, subparsers);
 
