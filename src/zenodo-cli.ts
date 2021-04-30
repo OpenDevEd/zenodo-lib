@@ -22,10 +22,7 @@ import {
 
 function getVersion() {
   const version = process.env.npm_package_version;
-  if (version) {
-    return logger.info(`zenodo-lib version=${version}`);
-  }
-  return version;
+  logger.info(`zenodo-lib version=${version}`);
 }
 
 function getArguments() {
