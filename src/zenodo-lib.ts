@@ -498,37 +498,6 @@ export async function duplicate(args, subparsers) {
 }
 
 export async function upload(args, subparsers) {
-  if (args.getInterface && subparsers) {
-    // ACTION: define CLI interface
-    const parser_upload = subparsers.add_parser('upload', {
-      help: 'Just upload files (shorthand for update id --files ...)',
-    });
-    parser_upload.add_argument('id', { nargs: '?' });
-    parser_upload.add_argument('--bucketurl', { action: 'store' });
-    parser_upload.add_argument('files', { nargs: '*' });
-    parser_upload.add_argument('--publish', {
-      action: 'store_true',
-      help: 'Publish the deposition after executing the command.',
-      default: false,
-    });
-    parser_upload.add_argument('--open', {
-      action: 'store_true',
-      help: 'Open the deposition in the browser after executing the command.',
-      default: false,
-    });
-    parser_upload.add_argument('--show', {
-      action: 'store_true',
-      help: 'Show the info of the deposition after executing the command.',
-      default: false,
-    });
-    parser_upload.add_argument('--dump', {
-      action: 'store_true',
-      help: 'Show json for deposition after executing the command.',
-      default: false,
-    });
-    parser_upload.set_defaults({ func: upload });
-    return { status: 0, message: 'success' };
-  }
   // ACTION: check arguments
   if ('files' in args) args.files = get_array(args.files);
   // ACTIONS...
