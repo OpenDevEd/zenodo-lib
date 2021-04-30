@@ -573,36 +573,6 @@ export async function update(args) {
 }
 
 export async function copy(args, subparsers) {
-  if (args.getInterface && subparsers) {
-    const parser_copy = subparsers.add_parser('multiduplicate', {
-      help:
-        'Duplicates existing deposit with id multiple times, once for each file.',
-    });
-    parser_copy.add_argument('id', { nargs: 1 });
-    parser_copy.add_argument('files', { nargs: '*' });
-    parser_copy.add_argument('--publish', {
-      action: 'store_true',
-      help: 'Publish the deposition after executing the command.',
-      default: false,
-    });
-    parser_copy.add_argument('--open', {
-      action: 'store_true',
-      help: 'Open the deposition in the browser after executing the command.',
-      default: false,
-    });
-    parser_copy.add_argument('--show', {
-      action: 'store_true',
-      help: 'Show the info of the deposition after executing the command.',
-      default: false,
-    });
-    parser_copy.add_argument('--dump', {
-      action: 'store_true',
-      help: 'Show json for deposition after executing the command.',
-      default: false,
-    });
-    parser_copy.set_defaults({ func: copy });
-    return { status: 0, message: 'success' };
-  }
   // ACTION: check arguments
   // ACTIONS...
   var bucket_url, metadata, response_data;
