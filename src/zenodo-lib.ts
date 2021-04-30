@@ -470,7 +470,7 @@ export async function dumpDeposition(args, id) {
   dumpJSON(info);
 }
 
-export async function duplicate(args, subparsers) {
+export async function duplicate(args) {
   // ACTION: check arguments
   // ACTIONS...
   let bucket_url, deposit_url, metadata, response_data;
@@ -497,7 +497,7 @@ export async function duplicate(args, subparsers) {
   return 0;
 }
 
-export async function upload(args, subparsers) {
+export async function upload(args) {
   // ACTION: check arguments
   if ('files' in args) args.files = get_array(args.files);
   // ACTIONS...
@@ -572,7 +572,7 @@ export async function update(args) {
   return responseUpdateRecord;
 }
 
-export async function copy(args, subparsers) {
+export async function copy(args) {
   // ACTION: check arguments
   // ACTIONS...
   var bucket_url, metadata, response_data;
@@ -648,7 +648,7 @@ export async function listDepositions(args) {
   return res;
 }
 
-export async function newVersion(args, subparsers) {
+export async function newVersion(args) {
   // ACTION: check arguments
   // TODO
   // ACTIONS...
@@ -912,7 +912,7 @@ export async function concept(args) {
 }
 
 // Top-level function - "zenodo-cli create'
-export async function create(args, subparsers?) {
+export async function create(args) {
   // ACTION: check arguments
   mydebug(args, 'zenodolib.create', args);
   // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
