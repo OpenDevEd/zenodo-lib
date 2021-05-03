@@ -172,7 +172,7 @@ async function publishDeposition(args, id) {
   const options = {
     method: 'post',
     url: `${zenodoAPIUrl}/${id}/actions/publish`,
-    params: params,
+    params,
     headers: { 'Content-Type': 'application/json' },
   };
   const responseDataFromAPIcall = await apiCall(args, options);
@@ -378,15 +378,19 @@ async function finalActions(args, id, deposit_url) {
 
 async function finalActions2(args, data) {
   mydebug(args, 'finalActions2', data);
+  logger.info('args = %O', { ...args });
   // the record need to contains files.
   // TODO: Whether whethr this is the case?
   let returnValue = data;
-  const id = data['id'];
+  const { id } = data;
   const deposit_url = data['links']['html'];
-  if ('publish' in args && args.publish) {
+  if (args.publish) {
+    logger.info('publishing in finalActions2');
     // publishDeposition will change the data, hence collecting return_value
     returnValue = await publishDeposition(args, id);
+    logger.info('publish response = %O', returnValue);
   }
+
   if ('show' in args && args.show) {
     await showDeposition(args, id);
   }
@@ -426,17 +430,17 @@ export async function getRecord(args) {
   const ids = parseIds(args.id);
   const output = [];
   for (const id of ids) {
-    //console.log(`saveIdsToJson ---0`)
+    // logger.info(`saveIdsToJson ---0`)
     data = await getData(args, id);
     output.push(data);
-    // console.log(JSON.stringify(data))
+    // logger.info(JSON.stringify(data))
     // Write record - TODO - should make this conditional
-    //console.log(`saveIdsToJson ---1a`)
+    // logger.info(`saveIdsToJson ---1a`)
     let path = `${id}.json`;
-    // console.log(`saveIdsToJson ---1b`)
+    // logger.info(`saveIdsToJson ---1b`)
     if (data && data['metadata']) {
       let buffer = Buffer.from(JSON.stringify(data['metadata']));
-      //console.log(`saveIdsToJson ---2`)
+      // logger.info(`saveIdsToJson ---2`)
       fs.open(path, 'w', function (err, fd) {
         if (err) {
           throw 'could not open file: ' + err;
@@ -448,16 +452,16 @@ export async function getRecord(args) {
         fs.write(fd, buffer, 0, buffer.length, null, function (err) {
           if (err) throw 'error writing file: ' + err;
           fs.close(fd, function () {
-            console.log('wrote the file successfully');
+            logger.info('wrote the file successfully');
           });
         });
       });
-      //console.log(`saveIdsToJson ---3`)
+      // logger.info(`saveIdsToJson ---3`)
       await finalActions(args, id, data['links']['html']);
-      //console.log(`saveIdsToJson ---4`)
+      // logger.info(`saveIdsToJson ---4`)
     } else {
-      console.log('DATA=' + JSON.stringify(data, null, 2));
-      console.log(
+      logger.info('DATA=' + JSON.stringify(data, null, 2));
+      logger.info(
         'Request completed successfully, but no data was retrieved. Do you have access to the record?'
       );
     }
@@ -541,7 +545,9 @@ export async function update(args) {
   id = parseIds(args.id);
   data = await getData(args, id);
   if (Array.isArray(data)) data = data[0];
-  if (args.verbose) console.log('update/data=' + JSON.stringify(data, null, 2));
+  if (args.verbose) {
+    logger.info('zenodo/update/data=' + JSON.stringify(data, null, 2));
+  }
   metadata = data['metadata'];
   //console.log(metadata);
   if (data.submitted == true && data.state == 'done') {
@@ -556,9 +562,12 @@ export async function update(args) {
   bucket_url = responseUpdateRecord['links']['bucket'];
   deposit_url = responseUpdateRecord['links']['html'];
   if (args.files) {
-    for (const filePath of args.files) {
-      await fileUpload(args, bucket_url, filePath);
-      // await finalActions(args, id, deposit_url);
+    if (!data.submitted) {
+      for (const filePath of args.files) {
+        await fileUpload(args, bucket_url, filePath);
+      }
+    } else {
+      logger.info('skipping upload of files because state = submitted');
     }
   }
   // As top-level function, execute final actions.
