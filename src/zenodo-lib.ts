@@ -351,11 +351,11 @@ async function fileUpload(args, bucket_url, journal_filepath) {
   const fileName = journal_filepath.replace('^.*\\/', '');
   console.log(`----------> ${journal_filepath}`);
   //console.log(data)
-  const destination = `${bucket_url}/${fileName}`;
+  const destination = encodeURI(`${bucket_url}/${fileName}`);
   const options = {
     method: 'put',
     url: destination,
-    params: params,
+    params,
     header: { 'Content-Type': 'application/octet-stream' },
     journal_filepath: journal_filepath,
   };
@@ -371,14 +371,14 @@ async function fileUpload(args, bucket_url, journal_filepath) {
 
 async function finalActions(args, id, deposit_url) {
   return finalActions2(args, {
-    id: id,
+    id,
     links: { html: deposit_url },
   });
 }
 
 async function finalActions2(args, data) {
   mydebug(args, 'finalActions2', data);
-  logger.info('args = %O', { ...args });
+  logger.info('args in finalactions2 = %O', { ...args });
   // the record need to contains files.
   // TODO: Whether whethr this is the case?
   let returnValue = data;
@@ -389,6 +389,8 @@ async function finalActions2(args, data) {
     // publishDeposition will change the data, hence collecting return_value
     returnValue = await publishDeposition(args, id);
     logger.info('publish response = %O', returnValue);
+  } else {
+    logger.info('not publishing in finalactions2');
   }
 
   if ('show' in args && args.show) {
@@ -416,7 +418,7 @@ export async function about(args) {
 
 // Top-level function - "zenodo-cli record'
 // TODO: Separate this out into getRecords and getRecord
-export async function getRecord(args) {
+export async function getRecord(args, skipFinalActions = false) {
   // check arguments
   // args.strict is a value
   if ('strict' in args) {
@@ -457,7 +459,12 @@ export async function getRecord(args) {
         });
       });
       // logger.info(`saveIdsToJson ---3`)
-      await finalActions(args, id, data['links']['html']);
+      logger.info('finalactions called in getRecord');
+      if (!skipFinalActions) {
+        await finalActions(args, id, data['links']['html']);
+      } else {
+        logger.info('skipped finalactions in getRecord');
+      }
       // logger.info(`saveIdsToJson ---4`)
     } else {
       logger.info('DATA=' + JSON.stringify(data, null, 2));
@@ -496,6 +503,8 @@ export async function duplicate(args) {
       // await finalActions(args, response_data["id"], deposit_url);
     }
   }
+
+  logger.info('finalactions called in duplicate');
   await finalActions(args, response_data['id'], deposit_url);
   // TODO: this should have proper return value other than 0
   return 0;
@@ -530,6 +539,8 @@ export async function upload(args) {
       const file = await fileUpload(args, bucket_url, filePath);
       output.files.push(file);
     }
+
+    logger.info('finalactions called in upload');
     output.final = await finalActions(args, args.id, deposit_url);
   } else {
     console.log('Unable to upload: bucketurl both not specified.');
@@ -538,7 +549,7 @@ export async function upload(args) {
 }
 
 // Top-level function - "zenodo-cli update'
-export async function update(args) {
+export async function update(args, skipFinalActions = false) {
   let bucket_url, data, deposit_url, id;
   let metadata;
 
@@ -571,7 +582,13 @@ export async function update(args) {
     }
   }
   // As top-level function, execute final actions.
-  await finalActions(args, id, deposit_url);
+
+  if (!skipFinalActions) {
+    logger.info('finalactions called in update');
+    await finalActions(args, id, deposit_url);
+  } else {
+    logger.info('skipped finalactions in update');
+  }
 
   // retrieve the record again, to get the final version after all updates... Really final actins should do that too.
   // TODO: See whether this can be optimised.
@@ -581,7 +598,7 @@ export async function update(args) {
   return responseUpdateRecord;
 }
 
-export async function copy(args) {
+export async function copy(args, skipFinalActions = false) {
   // ACTION: check arguments
   // ACTIONS...
   var bucket_url, metadata, response_data;
@@ -594,11 +611,17 @@ export async function copy(args) {
     response_data = await createRecord(args, metadata);
     bucket_url = response_data['links']['bucket'];
     await fileUpload(args, bucket_url, journal_filepath);
-    await finalActions(
-      args,
-      response_data['id'],
-      response_data['links']['html']
-    );
+
+    logger.info('finalactions called in copy');
+    if (!skipFinalActions) {
+      await finalActions(
+        args,
+        response_data['id'],
+        response_data['links']['html']
+      );
+    } else {
+      logger.info('finalactions skipped in copy');
+    }
   }
   return 0;
 }
@@ -642,6 +665,7 @@ export async function listDepositions(args) {
     var newres = [];
     await res.forEach(async function (item) {
       // console.log(item["record_id"], item["conceptrecid"]);
+      logger.info('finalactions called in listdeposition');
       const resfa = finalActions2(args, item);
       newres.push({
         record_id: item['record_id'],
@@ -657,7 +681,7 @@ export async function listDepositions(args) {
   return res;
 }
 
-export async function newVersion(args) {
+export async function newVersion(args, skipFinalActions = false) {
   // ACTION: check arguments
   // TODO
   // ACTIONS...
@@ -727,7 +751,7 @@ export async function newVersion(args) {
     args.strict = true;
     //TODO: discuss id_for_new_record seems erroraneous here
     // response_data = await getRecord(args, id_for_new_record);
-    response_data = await getRecord(args);
+    response_data = await getRecord(args, true);
   }
   // Now response data holds the new record.
   response_data = response_data[0];
@@ -788,11 +812,14 @@ export async function newVersion(args) {
   // Task 1: Determine the correct deposit_url
   const deposit_url_2 = response_data['id']['deposit_url'];
   // Task 2: There is a problem with await in finalAction
-  const finalactions = await finalActions(
-    args,
-    response_data['id'],
-    deposit_url_2
-  );
+
+  let finalactions;
+  if (!skipFinalActions) {
+    logger.info('finalactions called in newVersion');
+    finalactions = await finalActions(args, response_data['id'], deposit_url_2);
+  } else {
+    logger.info('finalactions skipped in newVersion');
+  }
   console.log('latest_draft: ', deposit_url_2);
   console.log('Done');
   return {
