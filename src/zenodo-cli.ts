@@ -103,8 +103,8 @@ async function run() {
       `API command:\n zenodolib.${args.func.name}(${JSON.stringify(
         args,
         null,
-        2
-      )})`
+        2,
+      )})`,
     );
   } else {
     const result = await args.func(args);
