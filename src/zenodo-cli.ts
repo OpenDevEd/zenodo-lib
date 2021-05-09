@@ -122,7 +122,3 @@ async function run() {
 }
 
 run();
-
-module.exports = {
-  node: 'current',
-};
