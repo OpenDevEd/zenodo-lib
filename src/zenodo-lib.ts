@@ -198,14 +198,14 @@ async function getData(args, id) {
     headers: { 'Content-Type': 'application/json' },
   };
   /*
-Two ways of getting the record:
-(1) Retrieve the record directly from the ID. I can do this if I know whether the ID is a 'plain record' or a 'concept record'.
-If I get this right, the request will fail.
+  Two ways of getting the record:
+  (1) Retrieve the record directly from the ID. I can do this if I know whether the ID is a 'plain record' or a 'concept record'.
+  If I get this right, the request will fail.
 
-(2) I can retrieve the record via a search. This will always return the record (both both plain and concept).
-However, the search index seems to take ~ 1 second to update. Therefore, if I can just created a record,
-it cannot be retrieved via this method.
-*/
+  (2) I can retrieve the record via a search. This will always return the record (both both plain and concept).
+  However, the search index seems to take ~ 1 second to update. Therefore, if I can just created a record,
+  it cannot be retrieved via this method.
+  */
   if ('strict' in args && args.strict) {
     options.url = options.url + '/' + id;
   } else {

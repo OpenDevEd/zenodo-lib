@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as os from 'os';
+import logger from './logger';
 
 export function get_value(value) {
   if (Array.isArray(value)) {
@@ -254,7 +255,8 @@ export function updateMetadata(args, metadata) {
   }
   // This function takes an existing object (metadata) and applies changes indicated by args.
   if (args.verbose) console.log('Updating metadata');
-  let authorInformationDict, authorInfo;
+  let authorInformationDict = {};
+  let authorInfo;
   let authorProvided = false;
   authorInformationDict = {};
   // If the --json/args.json argument is given, load the file, and overwrite metadata accordingly.
@@ -315,21 +317,25 @@ export function updateMetadata(args, metadata) {
   }
   // Step 2. Collect authors
   if ('authors' in args && args.authors) {
+    logger.info('args = %O', args);
     let creatorsNew = [];
     if ('creators' in metadata) {
       if (authorProvided) {
         creatorsNew = metadata['creators'];
       }
 
-      let auth_arr;
+      let authorsArray;
       if (Array.isArray(args.authors)) {
-        auth_arr = args.authors;
+        authorsArray = args.authors;
       } else {
-        auth_arr = [args.authors];
+        authorsArray = [args.authors];
       }
+
       try {
-        auth_arr.forEach((creator) => {
-          const entry = creator.split(/ *; */);
+        authorsArray.forEach((creator) => {
+          console.log('creator: ', creator);
+          const name = typeof creator === 'string' ? creator : creator.name;
+          const entry = name.split(/ *; */);
           let newentry = {};
           // TODO
           // This should result in an error:
@@ -344,7 +350,9 @@ export function updateMetadata(args, metadata) {
           try {
             if (entry.length >= 2 && entry[1] != '') {
               newentry['affiliation'] = entry[1];
-            } else if ('affiliation' in authorInformationDict[entry[0]]) {
+            } else if (
+              'affiliation' in (authorInformationDict[entry[0]] || {})
+            ) {
               console.log('Do we get here?');
               // Excercise left to the developer: Why do we not need to write && "affliation" in authorInformationDict[entry[0]] ?
               newentry = authorInformationDict[entry[0]];
