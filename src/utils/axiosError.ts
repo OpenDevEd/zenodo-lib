@@ -1,4 +1,4 @@
-const zenodoMessage = require('./zendoMessage');
+import zenodoMessage from './zendoMessage';
 
 export default function axiosError(error) {
   if (error.response) {
