@@ -1,10 +1,9 @@
 // TODO: forEach does not work with async - systematically check replace with "for-in"
 
 import axios from 'axios';
-// import { debug as debug } from 'console';
 import * as fs from 'fs';
+import path from 'path';
 import opn from 'opn';
-import logger = require('./logger');
 
 import {
   dumpJSON,
@@ -18,6 +17,10 @@ import {
   get_array,
   get_value,
 } from './helper';
+import zenodoMessage from './utils/zendoMessage';
+import axiosError from './utils/axiosError';
+
+import logger = require('./logger');
 
 /*
 module.exports.ZenodoAPI = ZenodoAPI
@@ -438,14 +441,21 @@ export async function getRecord(args, skipFinalActions = false) {
     // logger.info(JSON.stringify(data))
     // Write record - TODO - should make this conditional
     // logger.info(`saveIdsToJson ---1a`)
-    let path = `${id}.json`;
+    const dirPath = 'data';
+    if (!fs.existsSync(dirPath)) {
+      logger.info('outputDir not exist, creating');
+      fs.mkdirSync(dirPath);
+      logger.info('outputDir not exist, created');
+    }
+    let filePath = path.join(dirPath, `${id}.json`);
+    logger.info(`saving output to file ${filePath}`);
     // logger.info(`saveIdsToJson ---1b`)
     if (data && data['metadata']) {
       let buffer = Buffer.from(JSON.stringify(data['metadata']));
       // logger.info(`saveIdsToJson ---2`)
-      fs.open(path, 'w', function (err, fd) {
+      fs.open(filePath, 'w', function (err, fd) {
         if (err) {
-          throw 'could not open file: ' + err;
+          throw new Error('could not open file: ' + err);
         }
         /*
          write the contents of the buffer, from position 0 to the end, to the file descriptor
@@ -454,7 +464,7 @@ export async function getRecord(args, skipFinalActions = false) {
         fs.write(fd, buffer, 0, buffer.length, null, function (err) {
           if (err) throw 'error writing file: ' + err;
           fs.close(fd, function () {
-            logger.info('wrote the file successfully');
+            logger.info(`wrote the file successfully ${filePath}`);
           });
         });
       });
@@ -987,99 +997,6 @@ export async function create(args) {
   }
   mydebug(args, 'zenodo.create/final', response_data);
   return response_data;
-}
-
-async function axiosError(error) {
-  if (error.response) {
-    console.log(
-      'The request was made and the server responded with a status code that falls out of the range of 2xx',
-    );
-    console.log('ZENODO: Error in creating new record (other than 2xx)');
-    console.log(
-      'ZENODO: List of error codes: https://developers.zenodo.org/?shell#http-status-codes',
-    );
-    console.log('status:' + error.response.status);
-    zenodoMessage(error.response.status);
-    console.log('Error1', error.message);
-    console.log('Error2', JSON.stringify(error.response.errors));
-    console.log('Error3', error.response.data.status);
-    console.log('Error4', error.response.data.message);
-    console.log('Error5', JSON.stringify(error.response.data, null, 2));
-    // if (verbose) {
-    //  console.log(error.response.data);
-    //  console.log(error.response.headers);
-    // }
-  } else if (error.request) {
-    console.log(`The request was made but no response was received
-    'error.request' is an instance of XMLHttpRequest in the browser and an instance of
-    http.ClientRequest in node.js`);
-    console.log(error.request);
-  } else if (error.config) {
-    console.log(error.config);
-    console.log(`Fatal error in create->axios.post: ${error}`);
-  } else {
-    console.log(
-      'Something happened in setting up the request that triggered an Error',
-    );
-    console.log('Error', error.message);
-  }
-
-  // process.exit(1);
-}
-
-function zenodoMessage(number) {
-  if (number === 200)
-    console.log(
-      `${number}: OK	Request succeeded. Response included. Usually sent for GET/PUT/PATCH requests`,
-    );
-  else if (number === 201)
-    console.log(
-      `${number}: Created	Request succeeded. Response included. Usually sent for POST requests.`,
-    );
-  else if (number === 202)
-    console.log(
-      `${number}: Accepted	Request succeeded. Response included. Usually sent for POST requests, where background processing is needed to fulfill the request.`,
-    );
-  else if (number === 204)
-    console.log(
-      `${number}: No Content	Request succeeded. No response included. Usually sent for DELETE requests.`,
-    );
-  else if (number === 400)
-    console.log(
-      `${number}: Bad Request	Request failed. Error response included.`,
-    );
-  else if (number === 401)
-    console.log(
-      `${number}: Unauthorized	Request failed, due to an invalid access token. Error response included.`,
-    );
-  else if (number === 403)
-    console.log(
-      `${number}: Forbidden	Request failed, due to missing authorization (e.g. deleting an already submitted upload or missing scopes for your access token). Error response included.`,
-    );
-  else if (number === 404)
-    console.log(
-      `${number}: Not Found	Request failed, due to the resource not being found. Error response included.`,
-    );
-  else if (number === 405)
-    console.log(
-      `${number}: Method Not Allowed	Request failed, due to unsupported HTTP method. Error response included.`,
-    );
-  else if (number === 409)
-    console.log(
-      `${number}: Conflict	Request failed, due to the current state of the resource (e.g. edit a deopsition which is not fully integrated). Error response included.`,
-    );
-  else if (number === 415)
-    console.log(
-      `${number}: Unsupported Media Type	Request failed, due to missing or invalid request header Content-Type. Error response included.`,
-    );
-  else if (number === 429)
-    console.log(
-      `${number}: Too Many Requests	Request failed, due to rate limiting. Error response included.`,
-    );
-  else
-    console.log(
-      `${number}: Internal Server Error	Request failed, due to an internal server error. Error response NOT included. Don’t worry, Zenodo admins have been notified and will be dealing with the problem ASAP.`,
-    );
 }
 
 export {
