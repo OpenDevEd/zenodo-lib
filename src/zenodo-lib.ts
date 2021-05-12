@@ -570,7 +570,7 @@ export async function update(args, skipFinalActions = false) {
     logger.info('zenodo/update/data=' + JSON.stringify(data, null, 2));
   }
   metadata = data['metadata'];
-  // console.log(metadata);
+  logger.info('zenodoUpdate metadata = %O', metadata);
   if (data.submitted == true && data.state == 'done') {
     logger.info('Making record editable.');
     let response = await editDeposit(args, id);
