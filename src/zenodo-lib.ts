@@ -251,7 +251,7 @@ async function getData(args, id) {
 }
 
 async function getMetadata(args, id) {
-  return await getData(args, id)['metadata'];
+  return getData(args, id)['metadata'];
 }
 
 async function createRecord(args, metadata) {
