@@ -334,7 +334,11 @@ export function updateMetadata(args, metadata) {
       try {
         authorsArray.forEach((creator) => {
           console.log('creator: ', creator);
-          const name = typeof creator === 'string' ? creator : creator.name;
+          const name =
+            typeof creator === 'string'
+              ? creator
+              : creator.name ||
+                `${creator.firstName} ${creator.lastName};${creator.affiliation}`;
           const entry = name.split(/ *; */);
           let newentry = {};
           // TODO
