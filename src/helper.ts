@@ -381,7 +381,9 @@ export function updateMetadata(args, metadata) {
         console.log('Error in authors - data likely to be incomplete. ' + e);
       }
     }
-    metadata['creators'] = creatorsNew;
+    if (creatorsNew.length) {
+      metadata.creators = creatorsNew;
+    }
   }
 
   //console.log(`Step 1. ${metadata}`);
