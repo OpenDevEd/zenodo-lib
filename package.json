@@ -12,8 +12,6 @@
     "argparse": "^2.0.1",
     "axios": "^0.21.1",
     "opn": "^6.0.0",
-    "request": "^2.34",
-    "request-promise-native": "^1.0.9",
     "winston": "^3.3.3"
   },
   "devDependencies": {
