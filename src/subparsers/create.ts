@@ -26,6 +26,10 @@ export = function create(subparsers) {
     help:
       'The description (abstract) of the record. Overrides data provided via --json.',
   });
+  createSubparser.add_argument('--doi', {
+    action: 'store',
+    help: 'Provide a DOI for this record. Overrides data provided via --json.',
+  });
   createSubparser.add_argument('--communities', {
     action: 'store',
     help:

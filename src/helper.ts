@@ -398,6 +398,9 @@ export function updateMetadata(args, metadata) {
   if ('description' in args && args.description) {
     metadata['description'] = args.description;
   }
+  if ('doi' in args && args.doi) {
+    metadata['doi'] = args.doi;
+  }
 
   // Handle communities. Communities identifiers are added to the communitiesArray.
   let communitiesArray = [];
