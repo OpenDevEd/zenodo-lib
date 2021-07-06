@@ -1,8 +1,14 @@
 #!/usr/bin/env node
-
-import * as argparse from 'argparse';
+import parser = require('./parser');
 import logger = require('./logger');
-import configureSubparsers = require('./subparsers/configureSubparsers');
+// import configureSubparsers = require('./subparsers/configureSubparsers');
+
+// import record = require('./subparsers/record');
+// import about = require('./subparsers/about');
+// import create = require('./subparsers/create');
+// import update = require('./subparsers/update');
+// import duplicate = require('./subparsers/duplicate');
+// import upload = require('./subparsers/upload');
 
 // PRODUCTION: Load library
 /*
@@ -26,59 +32,19 @@ function getVersion() {
 }
 
 function getArguments() {
-  const parser = new argparse.ArgumentParser({
-    description: 'Zenodo command line utility',
-  });
-  parser.add_argument('--config', {
-    action: 'store',
-    default: 'config.json',
-    help:
-      'Config file with API key. By default config.json then ~/.config/zenodo-cli/config.json are used if no config is provided.',
-  });
-  parser.add_argument('--config-json', {
-    action: 'store',
-    help:
-      'Config string/object with API key.E.g., \'{"accessToken": "...", "env": "sandbox"}\'. Note: Elements override --config. On the command line, pass a string. For library use, pass string or object.',
-  });
-  parser.add_argument('--access-token', {
-    action: 'store',
-    help:
-      'Access token (API key) for Zenodo. If provided, overrides --config file and --config-json.',
-  });
-  parser.add_argument('--sandbox', {
-    action: 'store_true',
-    help:
-      'Indicate that the Zenodo API key provided is for the Zenodo sandbox. If provided, it overrides --zenodo-config file and --zenodo-config-json.',
-  });
-  parser.add_argument('--verbose', {
-    action: 'store_true',
-    help: 'Be more verbose',
-    default: false,
-  });
-  parser.add_argument('--debug', {
-    action: 'store_true',
-    help: 'Show as much information as possible.',
-    default: false,
-  });
-  parser.add_argument('--dryrun', {
-    action: 'store_true',
-    help: 'Show the API request and exit.',
-    default: false,
-  });
-  parser.add_argument('--allowconceptids', {
-    action: 'store_true',
-    help:
-      'If you specify a conceptid, this is replaced by the record_id. Otherwise an error is produced.',
-    default: false,
-  });
-  parser.add_argument('--version', {
-    action: 'store_true',
-    help: 'Show version',
-  });
+  // about(subparsers);
+  // record(subparsers);
+  // create(subparsers);
+  // update(subparsers);
+  // duplicate(subparsers);
+  // upload(subparsers);
 
-  configureSubparsers(parser);
-
+  console.log('parser: ', parser);
+  // console.log('subparsers: ', configureSubparsers);
+  // configureSubparsers(parser);
+  console.log('parse: ', parser);
   const parsed = parser.parse_args();
+
   if (process.argv.length === 2) {
     logger.info('No argument passed exiting with help');
     parser.print_help();

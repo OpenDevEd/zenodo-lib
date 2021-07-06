@@ -1,10 +1,22 @@
 const { createLogger, format, transports } = require('winston');
 
+import parser = require('./parser');
+
+console.log('parser: ', parser);
+
 function getLogingLevel() {
+  const args = parser.parse_args();
+
   let level = 'info';
 
-  if (process.env.NODE_ENV === 'production') {
+  if (args.silent) {
     level = 'error';
+  } else if (args.verbosityLevel === 1) {
+    level = 'verbose';
+  } else if (args.verbosityLevel === 2) {
+    level = 'debug';
+  } else {
+    level = 'info';
   }
 
   return level;
