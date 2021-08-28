@@ -5,6 +5,10 @@ import update = require('./update');
 import duplicate = require('./duplicate');
 import upload = require('./upload');
 import list = require('./list');
+import concept = require('./concept');
+import download = require('./download');
+import newVersion = require('./newVersion');
+import copy = require('./copy');
 
 export = function configureSubparsers(parser) {
   const subparsers = parser.add_subparsers({ help: 'sub-command help' });
@@ -16,5 +20,9 @@ export = function configureSubparsers(parser) {
   duplicate(subparsers);
   upload(subparsers);
   list(subparsers);
-  
+  concept(subparsers);
+  download(subparsers);
+  newVersion(subparsers);
+  copy(subparsers);
+
 };
