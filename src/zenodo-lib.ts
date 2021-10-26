@@ -962,6 +962,7 @@ export async function create(args) {
   // ACTION: check arguments
   mydebug(args, 'zenodolib.create', args);
   // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
+  const doi = args.doi ? args.doi : ""
   const zenodoDefault = {
     access_right: 'open',
     creators: [
@@ -977,7 +978,7 @@ export async function create(args) {
         identifier: 'zenodo',
       },
     ],
-    doi: '',
+    doi: doi,
     publication_type: 'report',
     upload_type: 'publication',
   };
