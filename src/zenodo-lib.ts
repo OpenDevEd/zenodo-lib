@@ -91,6 +91,8 @@ const resdata = await axios(options).then(res => {
     console.log(`zenodo-lib/response status code: ${res.status}`);
     zenodoMessage(res.status);
   }
+  zenodoMessage(res.status);
+  // console.log("TEMPORARY="+JSON.stringify(   res         ,null,2))
   let returndata;
   if (fullResponse) {
     mydebug(args, 'THEN - FINISHED - API CALL with fullresponse. res=', res);
@@ -702,7 +704,10 @@ export async function newVersion(args, skipFinalActions = false) {
   let id_of_old_record = parseId(args.id[0]);
   // In order to make a new version for args.id[0], we need to check that record.
   // Let's check a new version is possible.
+  console.log("TEMPORARY=" + JSON.stringify(id_of_old_record, null, 2))
   const data = await getData(args, id_of_old_record);
+  console.log("TEMPORARY=" + JSON.stringify(data, null, 2))
+  // process.exit(1)
   // if (!(data["state"] == "done" && data["submitted"])) {
   if (!(data['state'] === 'done')) {
     console.log(`The state of the record is ${data.state}.`);
@@ -725,13 +730,17 @@ export async function newVersion(args, skipFinalActions = false) {
     headers: { 'Content-Type': 'application/json' },
   };
   // This is the second call to the API, to get the existing recod.
+  console.log(options);
   const responseDataFromAPIcall = await apiCall(args, options);
-  // console.log(responseDataFromAPIcall);
+  console.log(responseDataFromAPIcall);
   // return responseDataFromAPIcall;
-  let response_data = responseDataFromAPIcall;
-  console.log('latest_draft: ', response_data['links']['latest_draft']);
-  const latest = response_data['links']['latest_draft'];
-  const newid = latest.match(/(\d+)$/);
+  let response_data = responseDataFromAPIcall;  
+  let newid;
+  if ('latest_draft' in response_data['links']) {
+    console.log('latest_draft: ', response_data['links']['latest_draft']);
+    const latest = response_data['links']['latest_draft'];
+    newid = latest.match(/(\d+)$/);
+  }
   var id_for_new_record = '';
   if (newid) {
     if (id_of_old_record != newid[1]) {
@@ -767,7 +776,7 @@ export async function newVersion(args, skipFinalActions = false) {
   response_data = response_data[0];
   console.log(
     'This should be the new record. data=' +
-      JSON.stringify(response_data, null, 2),
+    JSON.stringify(response_data, null, 2),
   );
   console.log('Updated metadata');
 
@@ -888,8 +897,8 @@ export async function download(args) {
           // uniquely referencing a specific file.
           console.log(fd);
           let buf = Buffer.from(
-              fileObj['checksum'] + ' ' + fileObj['filename'],
-            ),
+            fileObj['checksum'] + ' ' + fileObj['filename'],
+          ),
             pos = 0,
             offset = 0,
             len = buf.length;
