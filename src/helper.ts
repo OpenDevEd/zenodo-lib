@@ -197,8 +197,7 @@ export function showDepositionJSON(info) {
   console.log(`Published: ${info['submitted'] ? 'yes' : 'no'}`);
   console.log(`State: ${info['state']}`);
   console.log(
-    `URL: https://zenodo.org/${info['submitted'] ? 'record' : 'deposit'}/${
-      info['id']
+    `URL: https://zenodo.org/${info['submitted'] ? 'record' : 'deposit'}/${info['id']
     }`,
   );
   if ('bucket' in info['links']) {
@@ -230,6 +229,10 @@ export function updateMetadata(args, metadata) {
   /*
   The object 'metadata' is updated with fields from 'args' and returned.
   */
+  //console.log("--------------------------------------------------------------------------")
+  //console.log("updateMetadata TEMPORARY=" + JSON.stringify(args, null, 2))
+  //console.log("updateMetadata TEMPORARY=" + JSON.stringify(metadata, null, 2))
+  //console.log("--------------------------------------------------------------------------")
   if (args.help) {
     const help = {
       args: {
@@ -338,7 +341,7 @@ export function updateMetadata(args, metadata) {
             typeof creator === 'string'
               ? creator
               : creator.name ||
-                `${creator.firstName} ${creator.lastName};${creator.affiliation}`;
+              `${creator.firstName} ${creator.lastName};${creator.affiliation}`;
           const entry = name.split(/ *; */);
           let newentry = {};
           // TODO
@@ -372,7 +375,7 @@ export function updateMetadata(args, metadata) {
           } catch (e) {
             console.log(
               'Error in author affiliations - data likely to be incomplete. ' +
-                e,
+              e,
             );
           }
           creatorsNew.push(newentry);
@@ -395,11 +398,17 @@ export function updateMetadata(args, metadata) {
   if ('date' in args && args.date) {
     metadata['publication_date'] = args.date;
   }
+  if ('publication_date' in args && args.publication_date) {
+    metadata['publication_date'] = args.publication_date;
+  }
   if ('description' in args && args.description) {
     metadata['description'] = args.description;
   }
-  if ('doi' in args && args.doi) {
-    metadata['doi'] = args.doi;
+
+  if (!('suppressDOI' in args) && !args.suppressDOI) {
+    if ('doi' in args && args.doi) {
+      metadata['doi'] = args.doi;
+    }
   }
 
   // Handle communities. Communities identifiers are added to the communitiesArray.
@@ -460,6 +469,8 @@ export function updateMetadata(args, metadata) {
     ];
   }
   if (args.verbose) console.log(JSON.stringify(metadata, null, 2));
+  // console.log("updateMetadata TEMPORARY=" + JSON.stringify(metadata, null, 2))
+  // console.log("--------------------------------------------------------------------------")
   return metadata;
 }
 

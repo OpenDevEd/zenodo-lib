@@ -579,6 +579,7 @@ export async function update(args, skipFinalActions = false) {
     logger.info('response editDeposit: %O', response);
   }
 
+  args.suppressDOI = true;
   let metadataNew = await updateMetadata(args, metadata);
   let responseUpdateRecord = await updateRecord(args, id, metadataNew);
 
