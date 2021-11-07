@@ -704,9 +704,9 @@ export async function newVersion(args, skipFinalActions = false) {
   let id_of_old_record = parseId(args.id[0]);
   // In order to make a new version for args.id[0], we need to check that record.
   // Let's check a new version is possible.
-  console.log("TEMPORARY=" + JSON.stringify(id_of_old_record, null, 2))
+  // console.log("TEMPORARY=" + JSON.stringify(id_of_old_record, null, 2))
   const data = await getData(args, id_of_old_record);
-  console.log("TEMPORARY=" + JSON.stringify(data, null, 2))
+  // console.log("TEMPORARY=" + JSON.stringify(data, null, 2))
   // process.exit(1)
   // if (!(data["state"] == "done" && data["submitted"])) {
   if (!(data['state'] === 'done')) {
@@ -732,7 +732,8 @@ export async function newVersion(args, skipFinalActions = false) {
   // This is the second call to the API, to get the existing recod.
   console.log(options);
   const responseDataFromAPIcall = await apiCall(args, options);
-  console.log(responseDataFromAPIcall);
+  console.log("TEMPORARY responseDataFromAPIcall="+JSON.stringify(    responseDataFromAPIcall        ,null,2))
+   
   // return responseDataFromAPIcall;
   let response_data = responseDataFromAPIcall;  
   let newid;
@@ -740,6 +741,8 @@ export async function newVersion(args, skipFinalActions = false) {
     console.log('latest_draft: ', response_data['links']['latest_draft']);
     const latest = response_data['links']['latest_draft'];
     newid = latest.match(/(\d+)$/);
+  } else {
+
   }
   var id_for_new_record = '';
   if (newid) {
