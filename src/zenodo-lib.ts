@@ -19,23 +19,8 @@ import {
 } from './helper';
 import zenodoMessage from './utils/zendoMessage';
 import axiosError from './utils/axiosError';
-
 import logger = require('./logger');
-
-/*
-module.exports.ZenodoAPI = ZenodoAPI
-
-async function ZenodoAPI(args) {
-    try {
-  return CallFunctionWithName(args.action, args)
-    } catch (e) {
-  return {
-      "status": "error",
-      "data" : e
-  }
-    }
-}
-*/
+import md5File from './utils/md5-file';
 
 async function apiCall(args, options, fullResponse = false) {
   mydebug(args, 'API CALL -- async function apiCall', '');
@@ -43,36 +28,7 @@ async function apiCall(args, options, fullResponse = false) {
   mydebug(args, 'zenodo-lib/apiCall-config(2): options=', options);
   mydebug(args, 'zenodo-lib/apiCall-config(3): fullResponse=', fullResponse);
   if (args.verbose) console.log('zenodo-lib/await axios');
-  /*  try {
-      // Should this await be here?
-const resdata = await axios(options).then(res => {
-  if (args.verbose)
-    console.log("zenodo-lib/axios->then")
-  if ("verbose" in args && args.verbose) {
-    console.log(`zenodo-lib/response status code: ${res.status}`)
-    zenodoMessage(res.status)
-  }
-  if (fullResponse) {
-    mydebug(args, `THEN - FINISHED - API CALL with fullresponse. res=`, res)
-    returndata = res;
-  } else {
-    mydebug(args, `THEN - FINISHED - API CALL. res.data=`, res.data)
-    returndata = res.data;
-  }
-}).catch(function (err) {
-  console.log("zenodo-lib/axios->error")
-  if ("verbose" in args && args.verbose) {
-    console.log(err);
-  }
-  axiosError(err)
-  return null
-}).then(
-  //always executed
-} catch (E) {
 
-}
-);
-*/
   let res;
   try {
     res = await axios(options);
@@ -101,16 +57,12 @@ const resdata = await axios(options).then(res => {
     mydebug(args, 'THEN - FINISHED - API CALL. res.data=', res.data);
     returndata = res.data;
   }
-  // if (args.verbose || args.debug)
-  //  console.log("axios/resdata=" + JSON.stringify(Object.keys(res.data), null, 2))
-  // mydebug(args, "zenodo-lib/apiCall-result: data=", res)
+
   if (args.verbose || args.debug) console.log('FINISHED - API CALL');
   return returndata;
 }
 
-// Note: This is API call for [File upload] because the [header] is different in this case.
 async function apiCallFileUpload(args, options, fullResponse = false) {
-  // const payload = { "data": options.data }
   const payload = fs.readFileSync(options.journal_filepath);
   const destination = options.url;
   const axiosoptions = {
@@ -733,17 +685,19 @@ export async function newVersion(args, skipFinalActions = false) {
   // This is the second call to the API, to get the existing recod.
   console.log(options);
   const responseDataFromAPIcall = await apiCall(args, options);
-  console.log("TEMPORARY responseDataFromAPIcall="+JSON.stringify(    responseDataFromAPIcall        ,null,2))
-   
+  console.log(
+    'TEMPORARY responseDataFromAPIcall=' +
+      JSON.stringify(responseDataFromAPIcall, null, 2),
+  );
+
   // return responseDataFromAPIcall;
-  let response_data = responseDataFromAPIcall;  
+  let response_data = responseDataFromAPIcall;
   let newid;
   if ('latest_draft' in response_data['links']) {
     console.log('latest_draft: ', response_data['links']['latest_draft']);
     const latest = response_data['links']['latest_draft'];
     newid = latest.match(/(\d+)$/);
   } else {
-
   }
   var id_for_new_record = '';
   if (newid) {
@@ -780,7 +734,7 @@ export async function newVersion(args, skipFinalActions = false) {
   response_data = response_data[0];
   console.log(
     'This should be the new record. data=' +
-    JSON.stringify(response_data, null, 2),
+      JSON.stringify(response_data, null, 2),
   );
   console.log('Updated metadata');
 
@@ -866,6 +820,12 @@ export async function download(args) {
   if (data['files']) {
     // the record should be [published] to have this option.
     data['files'].forEach(async function (fileObj) {
+      const downloadFileMD5 = md5File(fileObj.filename);
+      if (downloadFileMD5 !== fileObj.checksum) {
+        throw new Error(
+          `MD5 hash not matching for dowloaded file, got ${downloadFileMD5} instead of ${fileObj.checksum}`,
+        );
+      }
       name = fileObj['filename'];
       console.log(`Downloading ${name}`);
       const res = await axios.get(fileObj['links']['download'], {
@@ -901,8 +861,8 @@ export async function download(args) {
           // uniquely referencing a specific file.
           console.log(fd);
           let buf = Buffer.from(
-            fileObj['checksum'] + ' ' + fileObj['filename'],
-          ),
+              fileObj['checksum'] + ' ' + fileObj['filename'],
+            ),
             pos = 0,
             offset = 0,
             len = buf.length;
@@ -975,7 +935,7 @@ export async function create(args) {
   // ACTION: check arguments
   mydebug(args, 'zenodolib.create', args);
   // Note that Zenodo does not require a date or a DOI, but it will generate those on creation.
-  const doi = args.doi ? args.doi : ""
+  const doi = args.doi ? args.doi : '';
   const zenodoDefault = {
     access_right: 'open',
     creators: [
