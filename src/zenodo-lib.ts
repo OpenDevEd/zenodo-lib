@@ -179,7 +179,7 @@ async function getData(args, id) {
     // Called id=077
     // Function returns data anyway.
     // Calling function assumes that id=077 is a valid id.
-    // TODO
+    // TODO: unfinished implementaion
     // Check whether data.metadata.id == id
     /*
     if (data.metadata.id != id) {
@@ -614,8 +614,7 @@ export async function listDepositions(args) {
     console.log(
       "Warning: using 'list' with '--publish' means that all of your depositions will be published. Please confirm by typing yes.",
     );
-    // TODO
-    // Capture user input. If yser types yes, continue. If user types anything else, then abort.
+    // FIXME: Capture user input. If yser types yes, continue. If user types anything else, then abort.
     var stdin = process.openStdin();
     stdin.addListener('data', function (d) {
       // note:  d is an object, and when converted to a string it will
@@ -623,7 +622,6 @@ export async function listDepositions(args) {
       // with toString() and then substring()
       console.log('you entered: [' + d.toString().trim() + ']');
     });
-    // TODO ^^^ Fix this
     process.exit(1);
   }
   if (res.length > 0) {
@@ -648,7 +646,7 @@ export async function listDepositions(args) {
 
 export async function newVersion(args, skipFinalActions = false) {
   // ACTION: check arguments
-  // TODO
+  // TODO: finish this implementation
   // ACTIONS...
   // Load config.
   const { zenodoAPIUrl, params } = loadConfig(args);

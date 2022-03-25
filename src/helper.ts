@@ -162,9 +162,9 @@ export function loadConfig(args) {
   return { params, zenodoAPIUrl };
 }
 
-// TODO
 export function parseId(id) {
-  var dot_split, slash_split;
+  // TODO: refactor this fn
+  let dot_split, slash_split;
   if (!isNaN(id.toString())) {
     return id;
   }
@@ -197,7 +197,8 @@ export function showDepositionJSON(info) {
   console.log(`Published: ${info['submitted'] ? 'yes' : 'no'}`);
   console.log(`State: ${info['state']}`);
   console.log(
-    `URL: https://zenodo.org/${info['submitted'] ? 'record' : 'deposit'}/${info['id']
+    `URL: https://zenodo.org/${info['submitted'] ? 'record' : 'deposit'}/${
+      info['id']
     }`,
   );
   if ('bucket' in info['links']) {
@@ -341,12 +342,10 @@ export function updateMetadata(args, metadata) {
             typeof creator === 'string'
               ? creator
               : creator.name ||
-              `${creator.firstName} ${creator.lastName};${creator.affiliation}`;
+                `${creator.firstName} ${creator.lastName};${creator.affiliation}`;
           const entry = name.split(/ *; */);
           let newentry = {};
-          // TODO
-          // This should result in an error:
-          // npm start -- create --authors
+          // TODO: This should result in an error
           if (entry[0] == '') {
             console.log(
               'Error: The author provided with --authors was blank. You need to provide at least one author.',
@@ -375,7 +374,7 @@ export function updateMetadata(args, metadata) {
           } catch (e) {
             console.log(
               'Error in author affiliations - data likely to be incomplete. ' +
-              e,
+                e,
             );
           }
           creatorsNew.push(newentry);
