@@ -15,7 +15,7 @@ export = function update(subparsers) {
   updateSubparser.add_argument('--date', { action: 'store' });
   updateSubparser.add_argument('--description', { action: 'store' });
   updateSubparser.add_argument('--files', { nargs: '*' });
-  // TODO
+  // TODO: make the --communitites exclusive with --json??
   updateSubparser.add_argument('--communities', {
     action: 'store',
     help:
