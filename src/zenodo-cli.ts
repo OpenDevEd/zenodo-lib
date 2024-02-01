@@ -21,8 +21,9 @@ import {
 */
 
 function getVersion() {
-  const version = process.env.npm_package_version;
-  logger.info(`zenodo-lib version=${version}`);
+  const pjson = require('../package.json');
+  if (pjson.version) logger.info(`zotero-lib version=${pjson.version}`);
+  return pjson.version;
 }
 
 function getArguments() {
